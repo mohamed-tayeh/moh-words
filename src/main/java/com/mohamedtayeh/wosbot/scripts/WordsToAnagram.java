@@ -50,7 +50,7 @@ public class WordsToAnagram implements Script {
                 continue;
             }
 
-            String hash = anagramHelper.wordToHash(word);
+            String hash = anagramHelper.lettersToHash(word);
             if (anagrams.containsKey(hash)) {
                 anagrams.get(hash).add(word);
                 continue;

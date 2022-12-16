@@ -28,9 +28,15 @@ public class SubAnagramFile {
         this.objectMapper = objectMapper;
         this.anagramHelper = anagramHelper;
         this.anagramFile = anagramFile;
-        this.executorService = Executors.newFixedThreadPool(1);
+        this.executorService = Executors.newFixedThreadPool(3);
         readFile();
+
     }
+
+    public ExecutorService getExecutorService() {
+        return executorService;
+    }
+
 
     /**
      * Gets the subAnagrams of a letters
@@ -104,10 +110,6 @@ public class SubAnagramFile {
         return new HashMap<>();
     }
 
-    public ExecutorService getExecutorService() {
-        return executorService;
-    }
-
     /**
      * Adds a new word to the subAnagrams file that was
      * not in the word file
@@ -130,14 +132,14 @@ public class SubAnagramFile {
      * @param word to be added
      */
     public void addWordFromFile(String word) {
-        String hash = anagramHelper.wordToHash(word);
+        String hash = anagramHelper.lettersToHash(word);
 
         if (subAnagrams.containsKey(hash)) {
             return;
         }
 
         subAnagrams.put(hash, new HashMap<>());
-        
+
         executorService.execute(() -> {
             computeSubAnagrams(word);
         });
@@ -155,7 +157,7 @@ public class SubAnagramFile {
             throw new InvalidSubAnagram("The subAnagram " + subAnagram + " is not a subAnagram of " + word);
         }
 
-        String hash = anagramHelper.wordToHash(word);
+        String hash = anagramHelper.lettersToHash(word);
         HashMap<Integer, TreeSet<String>> subAnagramsMap = subAnagrams.get(hash);
 
         if (subAnagramsMap == null) {
@@ -209,7 +211,7 @@ public class SubAnagramFile {
      */
     public Boolean containsSubAnagram(String word, String anagram) {
 
-        String hash = anagramHelper.wordToHash(word);
+        String hash = anagramHelper.lettersToHash(word);
         if (subAnagrams.containsKey(hash)) {
             HashMap<Integer, TreeSet<String>> subAnagramsMap = subAnagrams.get(hash);
             Integer length = anagram.length();
@@ -242,7 +244,7 @@ public class SubAnagramFile {
             subAnagramsByLen.put(length, set);
         }
 
-        subAnagrams.put(anagramHelper.wordToHash(letters), subAnagramsByLen);
+        this.subAnagrams.put(anagramHelper.lettersToHash(letters), subAnagramsByLen);
     }
 
     /**
@@ -283,6 +285,7 @@ public class SubAnagramFile {
         subsetDfs(letters, res, curr, index + 1);
     }
 
+
     private Boolean isSubAnagramOfWord(String word, String subAnagram) {
         Map<Character, Integer> wordMap = new HashMap<>();
         Map<Character, Integer> subAnagramMap = new HashMap<>();
@@ -312,8 +315,8 @@ public class SubAnagramFile {
         try {
             subAnagrams = objectMapper.readValue(new File(FilePaths.SUB_ANAGRAM_FILE), new TypeReference<>() {
             });
-        } catch (IOException ex) {
-            System.out.println("Error reading anagrams file: " + ex.getMessage());
+        } catch (IOException e) {
+            System.out.println("Error reading anagrams file: " + e.getMessage());
         }
     }
 
@@ -321,11 +324,10 @@ public class SubAnagramFile {
      * Write new hashmap to file
      */
     public synchronized void saveFile() {
-        System.out.println("Saving subAnagrams file");
         try {
             objectMapper.writeValue(new File(FilePaths.SUB_ANAGRAM_FILE), subAnagrams);
-        } catch (IOException ex) {
-            System.out.println("Error saving anagrams file: " + ex.getMessage());
+        } catch (IOException e) {
+            System.out.println("Error saving anagrams file: " + e.getMessage());
         }
     }
 }

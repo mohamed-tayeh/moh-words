@@ -27,7 +27,7 @@ public class AnagramFile {
      * @param word word to add
      */
     public void addWord(String word) {
-        String hash = anagramHelper.wordToHash(word);
+        String hash = anagramHelper.lettersToHash(word);
         if (anagrams.containsKey(hash)) {
             anagrams.get(hash).add(word);
         }
@@ -63,7 +63,7 @@ public class AnagramFile {
      * @return a set of anagrams
      */
     public Set<String> getAnagrams(String letters) {
-        String hash = anagramHelper.wordToHash(letters);
+        String hash = anagramHelper.lettersToHash(letters);
         if (anagrams.containsKey(hash)) {
             return anagrams.get(hash);
         }
@@ -90,7 +90,7 @@ public class AnagramFile {
      * @return true if word is in the file, false otherwise
      */
     public Boolean containsWord(String word) {
-        String hash = anagramHelper.wordToHash(word);
+        String hash = anagramHelper.lettersToHash(word);
         if (anagrams.containsKey(hash)) {
             return anagrams.get(hash).contains(word);
         }
