@@ -3,6 +3,7 @@ package com.mohamedtayeh.wosbot.scripts;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mohamedtayeh.wosbot.features.anagramHelper.AnagramHelper;
+import com.mohamedtayeh.wosbot.features.constants.Constants;
 
 import java.io.File;
 import java.util.HashMap;
@@ -10,7 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class WordsToAnagram implements Script{
+public class WordsToAnagram implements Script {
     private final ObjectMapper objectMapper;
     private final AnagramHelper anagramHelper;
     private final String sourcePath;
@@ -23,7 +24,7 @@ public class WordsToAnagram implements Script{
         this.destPath = destPath;
     }
 
-
+    @Override
     public void run() {
         wordListToAnagramStruct();
     }
@@ -45,6 +46,10 @@ public class WordsToAnagram implements Script{
         HashMap<String, Set<String>> anagrams = new HashMap<>();
 
         for (String word : words) {
+            if (word.length() > Constants.MAX_WORD_LENGTH || word.length() < Constants.MIN_WORD_LENGTH) {
+                continue;
+            }
+
             String hash = anagramHelper.wordToHash(word);
             if (anagrams.containsKey(hash)) {
                 anagrams.get(hash).add(word);
@@ -58,7 +63,7 @@ public class WordsToAnagram implements Script{
 
         try {
             objectMapper.writeValue(new File(destPath), anagrams);
-        } catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
