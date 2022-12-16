@@ -2,6 +2,7 @@ package com.mohamedtayeh.wosbot.features;
 
 import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
+import com.mohamedtayeh.wosbot.features.constants.Constants;
 import com.mohamedtayeh.wosbot.features.constants.Responses;
 import com.mohamedtayeh.wosbot.features.dictionaryApi.DictionaryApi;
 import com.mohamedtayeh.wosbot.features.messageHelper.MessageHelper;
@@ -37,6 +38,10 @@ public class AddAnagramCommand extends Command {
     @Override
     public void onChannelMessage(ChannelMessageEvent event) {
 
+        if (!event.getMessage().startsWith(Constants.COMMAND_PREFIX)) {
+            return;
+        }
+
         String[] msgSplit = messageHelper.parseMesssage(event);
 
         if (!cmdSet.contains(msgSplit[0]) || msgSplit.length < 2) {
@@ -61,7 +66,6 @@ public class AddAnagramCommand extends Command {
             return;
         }
 
-
         if (!subAnagramFile.containsWord(word)) {
             this.say(event, String.format(Responses.WORD_NOT_FOUND, event.getUser().getName(), word));
             return;
@@ -72,26 +76,24 @@ public class AddAnagramCommand extends Command {
             return;
         }
 
-        try {
+        dictionaryApi
+                .isWord(subAnagram)
+                .thenAccept(isWord -> {
+                    if (!isWord) {
+                        this.say(event, String.format(Responses.NOT_A_WORD, subAnagram, event.getUser().getName()));
+                        return;
+                    }
 
-            if (!dictionaryApi.isWord(subAnagram)) {
-                this.say(event, String.format(Responses.NOT_A_WORD, subAnagram, event.getUser().getName()));
-                return;
-            }
+                    try {
+                        subAnagramFile.addSubAnagram(word, subAnagram);
+                    } catch (InvalidSubAnagram e) {
+                        this.say(event, String.format(Responses.ANAGRAM_NOT_VALID, event.getUser().getName()));
+                        return;
+                    }
 
-        } catch (Exception e) {
-            this.say(event, Responses.UNKNOWN_ERROR);
-            return;
-        }
+                    this.say(event, String.format(Responses.ANAGRAM_ADDED, event.getUser().getName()));
+                });
 
-        try {
-            subAnagramFile.addSubAnagram(word, subAnagram);
-        } catch (InvalidSubAnagram e) {
-            this.say(event, String.format(Responses.ANAGRAM_NOT_VALID, event.getUser().getName()));
-            return;
-        }
-
-        this.say(event, String.format(Responses.ANAGRAM_ADDED, event.getUser().getName()));
     }
 
 }

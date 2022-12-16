@@ -7,7 +7,9 @@ import com.mohamedtayeh.wosbot.features.constants.Constants;
 import com.mohamedtayeh.wosbot.features.constants.Responses;
 import com.mohamedtayeh.wosbot.features.messageHelper.MessageHelper;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 
 public class GetAnagramsCommand extends Command {
     private static final List<String> cmds = Arrays.asList("!anagram", "!anagrams");
@@ -32,6 +34,10 @@ public class GetAnagramsCommand extends Command {
      */
     @Override
     public void onChannelMessage(ChannelMessageEvent event) {
+        if (!event.getMessage().startsWith(Constants.COMMAND_PREFIX)) {
+            return;
+        }
+
         String[] msgSplit = messageHelper.parseMesssage(event);
 
         if (!cmdSet.contains(msgSplit[0]) || msgSplit.length < 2) {

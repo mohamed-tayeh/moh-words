@@ -14,7 +14,7 @@ public class AnagramHelper {
      * @param letters to convert
      * @return hash of the letters
      */
-    public String wordToHash(String letters) {
+    public String lettersToHash(String letters) {
         letters = letters.toLowerCase();
         int[] charCount = new int[26];
         for (int i = 0; i < letters.length(); i++) {
@@ -69,7 +69,7 @@ public class AnagramHelper {
             }
         }
 
-        hashes.add(wordToHash(letters));
+        hashes.add(lettersToHash(letters));
         return hashes;
     }
 
