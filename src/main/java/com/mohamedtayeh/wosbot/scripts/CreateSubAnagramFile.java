@@ -1,42 +1,57 @@
 package com.mohamedtayeh.wosbot.scripts;
 
-import com.mohamedtayeh.wosbot.features.anagramFile.AnagramFile;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mohamedtayeh.wosbot.features.constants.Constants;
 import com.mohamedtayeh.wosbot.features.subAnagramFile.SubAnagramFile;
 
-import java.util.concurrent.TimeUnit;
+import java.io.File;
+import java.util.List;
+import java.util.concurrent.*;
 
 public class CreateSubAnagramFile implements Script {
-    private final AnagramFile anagramFile;
+    private final ObjectMapper objectMapper;
     private final SubAnagramFile subAnagramFile;
+    private final String wordPath;
 
-    public CreateSubAnagramFile(AnagramFile anagramFile, SubAnagramFile subAnagramFile) {
-
-        this.anagramFile = anagramFile;
+    public CreateSubAnagramFile(ObjectMapper objectMapper, SubAnagramFile subAnagramFile, String wordPath) {
+        this.objectMapper = objectMapper;
         this.subAnagramFile = subAnagramFile;
-
+        this.wordPath = wordPath;
     }
 
     @Override
     public void run() {
-        int size = anagramFile.getAnagrams().keySet().size();
-        int counter = 0;
-
-        for (String word : anagramFile.getAnagrams().keySet()) {
-            counter++;
-            subAnagramFile.addWord(word);
-            if (counter % 10000 == 0) {
-                System.out.println("Progress: " + counter + "/" + size);
-            }
-        }
+        List<String> words;
 
         try {
-            subAnagramFile.getExecutorService().awaitTermination(10, TimeUnit.MINUTES);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+            words = objectMapper.readValue(new File(wordPath), new TypeReference<>() {
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
         }
 
-        subAnagramFile.saveFile();
+        for (String word : words) {
+            if (word.length() < Constants.MIN_WORD_LENGTH || word.length() > Constants.MAX_WORD_LENGTH) {
+                continue;
+            }
+
+            subAnagramFile.addWordFromFile(word);
+        }
+
+        ExecutorService executorService = subAnagramFile.getExecutorService();
+        executorService.shutdown();
+        ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(1);
+
+        scheduledExecutor.scheduleAtFixedRate(() -> {
+            System.out.println("Get Completed Tasks: " + ((ThreadPoolExecutor) executorService).getCompletedTaskCount());
+
+            if (executorService.isTerminated()) {
+                subAnagramFile.saveFile();
+                scheduledExecutor.shutdown();
+                executorService.shutdown();
+            }
+        }, 0, 10, TimeUnit.SECONDS);
     }
-
-
 }
