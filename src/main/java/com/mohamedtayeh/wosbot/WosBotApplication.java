@@ -35,11 +35,11 @@ import com.mohamedtayeh.wosbot.scripts.RunScript;
 public class WosBotApplication {
 
     public static void main(String[] args) {
-//        runScript();
-//        Bot bot = new Bot();
-//        bot.registerFeatures();
-//        bot.start();
-//        System.out.println("Bot is connected...");
+        runScript();
+        // Bot bot = new Bot();
+        // bot.registerFeatures();
+        // bot.start();
+        // System.out.println("Bot is connected...");
     }
 
     public static void runScript() {
@@ -48,4 +48,3 @@ public class WosBotApplication {
     }
 
 }
-
