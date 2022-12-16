@@ -28,13 +28,8 @@ public class SubAnagramFile {
         this.objectMapper = objectMapper;
         this.anagramHelper = anagramHelper;
         this.anagramFile = anagramFile;
-        this.executorService = Executors.newFixedThreadPool(3);
+        this.executorService = Executors.newFixedThreadPool(1);
         readFile();
-
-    }
-
-    public ExecutorService getExecutorService() {
-        return executorService;
     }
 
     /**
@@ -109,18 +104,43 @@ public class SubAnagramFile {
         return new HashMap<>();
     }
 
+    public ExecutorService getExecutorService() {
+        return executorService;
+    }
+
     /**
-     * Adds a word to the subAnagrams file
+     * Adds a new word to the subAnagrams file that was
+     * not in the word file
      *
      * @param word to add
      */
     public void addWord(String word) {
-        Runnable runnable = () -> {
-            // anagramFile.addWord(word);
-            computeSubAnagrams(word);
-        };
 
-        executorService.submit(runnable);
+        executorService.execute(() -> {
+            anagramFile.addWord(word);
+            computeSubAnagrams(word);
+            anagramFile.saveFile();
+            saveFile();
+        });
+    }
+
+    /**
+     * Adds a word from the words file to the subAnagrams file
+     *
+     * @param word to be added
+     */
+    public void addWordFromFile(String word) {
+        String hash = anagramHelper.wordToHash(word);
+
+        if (subAnagrams.containsKey(hash)) {
+            return;
+        }
+
+        subAnagrams.put(hash, new HashMap<>());
+        
+        executorService.execute(() -> {
+            computeSubAnagrams(word);
+        });
     }
 
     /**
@@ -162,12 +182,12 @@ public class SubAnagramFile {
      * @param subAnagramsList the anagrams for the word
      */
     public void addAnagrams(String word, List<String> subAnagramsList) {
-        Runnable runnable = () -> {
+        executorService.execute(() -> {
             anagramFile.addWords(subAnagramsList);
             computeSubAnagrams(word);
-        };
-
-        new Thread(runnable).start();
+            anagramFile.saveFile();
+            saveFile();
+        });
     }
 
     /**
@@ -223,8 +243,6 @@ public class SubAnagramFile {
         }
 
         subAnagrams.put(anagramHelper.wordToHash(letters), subAnagramsByLen);
-        // anagramFile.saveFile();
-        // saveFile();
     }
 
     /**
