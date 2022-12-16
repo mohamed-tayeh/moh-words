@@ -2,6 +2,7 @@ package com.mohamedtayeh.wosbot.features;
 
 import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
+import com.mohamedtayeh.wosbot.features.constants.Constants;
 import com.mohamedtayeh.wosbot.features.constants.Responses;
 import com.mohamedtayeh.wosbot.features.dictionaryApi.DictionaryApi;
 import com.mohamedtayeh.wosbot.features.messageHelper.MessageHelper;
@@ -36,6 +37,10 @@ public class AddWordCommand extends Command {
     @Override
     public void onChannelMessage(ChannelMessageEvent event) {
 
+        if (!event.getMessage().startsWith(Constants.COMMAND_PREFIX)) {
+            return;
+        }
+
         String[] msgSplit = messageHelper.parseMesssage(event);
 
         if (!cmdSet.contains(msgSplit[0]) || msgSplit.length < 2) {
@@ -49,21 +54,17 @@ public class AddWordCommand extends Command {
             return;
         }
 
-        try {
+        dictionaryApi
+                .isWord(word)
+                .thenAccept(isWord -> {
+                    if (isWord) {
+                        subAnagramFile.addWord(word);
+                        this.say(event, String.format(Responses.WORD_ADDED, event.getUser().getName()));
+                        return;
+                    }
 
-            if (!dictionaryApi.isWord(word)) {
-                this.say(event, String.format(Responses.NOT_A_WORD, word, event.getUser().getName()));
-                return;
-            }
-
-        } catch (Exception e) {
-            this.say(event, Responses.UNKNOWN_ERROR);
-            return;
-        }
-
-        subAnagramFile.addWord(word);
-
-        this.say(event, String.format(Responses.WORD_ADDED, event.getUser().getName()));
+                    this.say(event, String.format(Responses.NOT_A_WORD, word, event.getUser().getName()));
+                });
 
     }
 
