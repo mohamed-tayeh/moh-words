@@ -11,6 +11,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 public class WordApi {
@@ -20,25 +21,24 @@ public class WordApi {
         this.objectMapper = objectMapper;
     }
 
-    public AnagramRes getWords(String word, Integer minLength, Integer maxLength) throws IOException, InterruptedException {
+    public CompletableFuture<AnagramRes> getWords(String word, Integer minLength, Integer maxLength) throws IOException, InterruptedException {
         if (word == null || word.isEmpty()) {
-            return new AnagramRes();
+            return CompletableFuture.supplyAsync(AnagramRes::new);
         }
         return queryWord(word, minLength, maxLength);
     }
 
-    private AnagramRes queryWord(String word, Integer minLength, Integer maxLength) throws IOException, InterruptedException {
+    private CompletableFuture<AnagramRes> queryWord(String word, Integer minLength, Integer maxLength) throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
         String uri = String.format(ApiURLS.WORD_API, word, minLength, maxLength);
         HttpRequest req = HttpRequest.newBuilder().uri(URI.create(uri)).build();
-        String res = client.sendAsync(req, HttpResponse.BodyHandlers.ofString())
+        return client.sendAsync(req, HttpResponse.BodyHandlers.ofString())
                 .thenApply(HttpResponse::body)
-                .join();
-        return parseRes(res);
+                .thenApply(this::parseRes);
     }
 
     private AnagramRes parseRes(String res) {
-        AnagramRes anagramRes = null;
+        AnagramRes anagramRes = new AnagramRes();
 
         try {
             anagramRes = objectMapper.readValue(res, AnagramRes.class);
