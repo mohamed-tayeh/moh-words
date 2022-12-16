@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 public class AnagramFile {
     private final ObjectMapper objectMapper;
     private final AnagramHelper anagramHelper;
-    private volatile HashMap<String, Set<String>> anagrams;
+    private volatile HashMap<String, TreeSet<String>> anagrams;
 
     public AnagramFile(ObjectMapper objectMapper, AnagramHelper anagramHelper) {
         this.objectMapper = objectMapper;
@@ -31,7 +31,7 @@ public class AnagramFile {
         if (anagrams.containsKey(hash)) {
             anagrams.get(hash).add(word);
         }
-        anagrams.put(hash, new HashSet<>(Collections.singletonList(word)));
+        anagrams.put(hash, new TreeSet<>(Collections.singletonList(word)));
     }
 
     /**
@@ -44,7 +44,7 @@ public class AnagramFile {
     }
 
     public String getAnagramsString(String letters) {
-        return String.join(" ", new TreeSet<>(getAnagrams(letters)));
+        return String.join(" ", getAnagrams(letters));
     }
 
     /**
@@ -52,7 +52,7 @@ public class AnagramFile {
      *
      * @return the anagrams object
      */
-    public HashMap<String, Set<String>> getAnagrams() {
+    public HashMap<String, TreeSet<String>> getAnagrams() {
         return anagrams;
     }
 
