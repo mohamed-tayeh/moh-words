@@ -35,3 +35,6 @@ build/
 
 ### Credentials ###
 **/config.json
+
+### Files ###
+*.json
