@@ -2,11 +2,11 @@ package com.mohamedtayeh.wosbot.features.anagramHelper;
 
 import com.mohamedtayeh.wosbot.features.anagramHelper.Exceptions.TooManyWildCards;
 import com.mohamedtayeh.wosbot.features.constants.Constants;
+import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
+@Service
 public class AnagramHelper {
     /**
      * Converts a letters to a hash
@@ -71,6 +71,73 @@ public class AnagramHelper {
 
         hashes.add(lettersToHash(letters));
         return hashes;
+    }
+
+
+    /**
+     * Get all possible subsets of letters
+     *
+     * @param letters to get the subsets from
+     * @return list of subsets
+     */
+    public List<String> allSubsets(String letters) {
+        List<String> subsets = new ArrayList<>();
+        Stack<String> currSubset = new Stack<>();
+        subsetDfs(letters, subsets, currSubset, 0);
+        return subsets;
+    }
+
+    /**
+     * Returns true if subAnagram can be made from word
+     *
+     * @param word       to check if subAnagram can be made from
+     * @param subAnagram to check if it can be made from word
+     * @return true if subAnagram can be made from word, false otherwise
+     */
+    public Boolean isSubAnagramOfWord(String word, String subAnagram) {
+        Map<Character, Integer> wordMap = new HashMap<>();
+        Map<Character, Integer> subAnagramMap = new HashMap<>();
+
+        for (char c : word.toCharArray()) {
+            wordMap.put(c, wordMap.getOrDefault(c, 0) + 1);
+        }
+
+        for (char c : subAnagram.toCharArray()) {
+            subAnagramMap.put(c, subAnagramMap.getOrDefault(c, 0) + 1);
+        }
+
+        for (char k : wordMap.keySet()) {
+            if (wordMap.get(k) > subAnagramMap.getOrDefault(k, 0)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Helper function for allSubsets method
+     *
+     * @param letters to get the subsets from
+     * @param res     the list to add the subsets to
+     * @param curr    the current subset
+     * @param index   the current index being traversed
+     */
+    private void subsetDfs(String letters, List<String> res, Stack<String> curr, Integer index) {
+        if (index == letters.length() && curr.size() < 4) {
+            return;
+        }
+
+        if (index == letters.length()) {
+            res.add(String.join("", curr));
+            return;
+        }
+
+        curr.add(String.valueOf(letters.charAt(index)));
+        subsetDfs(letters, res, curr, index + 1);
+
+        curr.pop();
+        subsetDfs(letters, res, curr, index + 1);
     }
 
 }
