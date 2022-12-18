@@ -2,7 +2,7 @@ package com.mohamedtayeh.wosbot.features;
 
 import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
-import com.mohamedtayeh.wosbot.features.anagramFile.AnagramFile;
+import com.mohamedtayeh.wosbot.db.Anagram.AnagramController;
 import com.mohamedtayeh.wosbot.features.constants.Constants;
 import com.mohamedtayeh.wosbot.features.constants.Responses;
 import com.mohamedtayeh.wosbot.features.messageHelper.MessageHelper;
@@ -20,7 +20,7 @@ import java.util.List;
 public class GetAnagramsCommand extends Command {
     private static final List<String> cmds = Arrays.asList("!anagram", "!anagrams");
     private static final HashSet<String> cmdSet = new HashSet<String>(cmds);
-    private final AnagramFile anagramFile;
+    private final AnagramController anagramController;
     private final MessageHelper messageHelper;
 
     @Override
@@ -43,21 +43,22 @@ public class GetAnagramsCommand extends Command {
             return;
         }
 
+        String word = msgSplit[1];
         if (msgSplit[1].length() > Constants.MAX_WORD_LENGTH) {
             this.say(event, String.format(Responses.WORD_TOO_LONG, event.getUser().getName()));
             return;
         }
 
-        String anagrams = anagramFile.getAnagramsString(msgSplit[1]);
+        String anagrams = anagramController.getAnagramsString(word);
         String res;
 
         if (anagrams.isEmpty()) {
-            res = String.format(Responses.NO_ANAGRAMS_RES, msgSplit[1]);
+            res = String.format(Responses.NO_ANAGRAMS_RES, word);
             this.say(event, res);
             return;
         }
 
-        res = String.format(Responses.ANAGRAMS_RES, msgSplit[1], anagrams);
+        res = String.format(Responses.ANAGRAMS_RES, word, anagrams);
         this.say(event, res);
     }
 
