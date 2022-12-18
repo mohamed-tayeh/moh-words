@@ -22,8 +22,6 @@ public class Bot {
      * Twitch4J API
      */
     private final ITwitchClient twitchClient;
-    private final AddWordCommand AddWordCommand;
-    private final AddAnagramCommand AddAnagramCommand;
     private final DefineCommand DefineCommand;
     private final GetAnagramsCommand GetAnagramsCommand;
     private final GetWordsCommand GetWordsCommand;
@@ -32,7 +30,7 @@ public class Bot {
      */
     private Configuration configuration;
 
-    public Bot(AddWordCommand AddWordCommand, AddAnagramCommand AddAnagramCommand, DefineCommand DefineCommand, GetAnagramsCommand GetAnagramsCommand, GetWordsCommand GetWordsCommand) {
+    public Bot(DefineCommand DefineCommand, GetAnagramsCommand GetAnagramsCommand, GetWordsCommand GetWordsCommand) {
         // Load Configuration
         loadConfiguration();
 
@@ -59,13 +57,11 @@ public class Bot {
                  */
                 .build();
 
-        this.AddWordCommand = AddWordCommand;
-        this.AddAnagramCommand = AddAnagramCommand;
         this.DefineCommand = DefineCommand;
         this.GetAnagramsCommand = GetAnagramsCommand;
         this.GetWordsCommand = GetWordsCommand;
     }
-    
+
     /**
      * Method to register all features
      */
@@ -73,8 +69,6 @@ public class Bot {
     public void registerFeatures() {
         // Register Event Handlers
         SimpleEventHandler eventHandler = twitchClient.getEventManager().getEventHandler(SimpleEventHandler.class);
-        AddWordCommand.handleEvent(eventHandler);
-        AddAnagramCommand.handleEvent(eventHandler);
         DefineCommand.handleEvent(eventHandler);
         GetAnagramsCommand.handleEvent(eventHandler);
         GetWordsCommand.handleEvent(eventHandler);
