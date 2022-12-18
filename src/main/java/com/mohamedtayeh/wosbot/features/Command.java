@@ -1,5 +1,6 @@
 package com.mohamedtayeh.wosbot.features;
 
+import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
 
 import java.util.ArrayList;
@@ -8,6 +9,8 @@ import java.util.List;
 public abstract class Command {
 
     public abstract void onChannelMessage(ChannelMessageEvent event);
+
+    public abstract void handleEvent(SimpleEventHandler event);
 
     /**
      * Sends a message to the chat

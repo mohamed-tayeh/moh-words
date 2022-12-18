@@ -4,9 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mohamedtayeh.wosbot.features.constants.ApiURLS;
 import com.mohamedtayeh.wosbot.features.wordApi.responses.AnagramRes;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -17,18 +17,18 @@ import java.util.concurrent.CompletableFuture;
 public class WordApi {
     private final ObjectMapper objectMapper;
 
-    public WordApi(ObjectMapper objectMapper) {
+    public WordApi(@Autowired ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 
-    public CompletableFuture<AnagramRes> getWords(String word, Integer minLength, Integer maxLength) throws IOException, InterruptedException {
+    public CompletableFuture<AnagramRes> getWords(String word, Integer minLength, Integer maxLength) {
         if (word == null || word.isEmpty()) {
             return CompletableFuture.supplyAsync(AnagramRes::new);
         }
         return queryWord(word, minLength, maxLength);
     }
 
-    private CompletableFuture<AnagramRes> queryWord(String word, Integer minLength, Integer maxLength) throws IOException, InterruptedException {
+    private CompletableFuture<AnagramRes> queryWord(String word, Integer minLength, Integer maxLength) {
         HttpClient client = HttpClient.newHttpClient();
         String uri = String.format(ApiURLS.WORD_API, word, minLength, maxLength);
         HttpRequest req = HttpRequest.newBuilder().uri(URI.create(uri)).build();

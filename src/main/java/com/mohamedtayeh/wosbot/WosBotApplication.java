@@ -1,20 +1,15 @@
 package com.mohamedtayeh.wosbot;
 
-import com.mohamedtayeh.wosbot.scripts.RunScript;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
 
-
+@SpringBootApplication
 public class WosBotApplication {
-
     public static void main(String[] args) {
-        Bot bot = new Bot();
-        bot.registerFeatures();
+        ApplicationContext context = SpringApplication.run(WosBotApplication.class, args);
+        Bot bot = context.getBean(Bot.class);
         bot.start();
         System.out.println("Bot is connected...");
     }
-
-    public static void runScript() {
-        RunScript runScript = new RunScript();
-        runScript.run();
-    }
-
 }

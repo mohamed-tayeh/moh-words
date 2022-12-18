@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mohamedtayeh.wosbot.features.constants.ApiURLS;
 import com.mohamedtayeh.wosbot.features.dictionaryApi.responses.Word;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -11,10 +13,11 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.concurrent.CompletableFuture;
 
+@Service
 public class DictionaryApi {
     private final ObjectMapper objectMapper;
 
-    public DictionaryApi(ObjectMapper objectMapper) {
+    public DictionaryApi(@Autowired ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 

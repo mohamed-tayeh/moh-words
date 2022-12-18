@@ -1,5 +1,8 @@
 package com.mohamedtayeh.wosbot.features.constants;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class Responses {
     public static final String WORD_TOO_LONG = "@%s The maximum number of letters allowed is 15!";
     public static final String UNKNOWN_ERROR = "An unknown error occurred! Moh has been notified.";

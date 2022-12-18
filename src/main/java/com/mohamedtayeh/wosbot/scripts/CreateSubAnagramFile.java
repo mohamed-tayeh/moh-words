@@ -3,41 +3,47 @@ package com.mohamedtayeh.wosbot.scripts;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mohamedtayeh.wosbot.features.constants.Constants;
+import com.mohamedtayeh.wosbot.features.constants.FilePaths;
 import com.mohamedtayeh.wosbot.features.subAnagramFile.SubAnagramFile;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.util.List;
 import java.util.concurrent.*;
 
+@Service
+@RequiredArgsConstructor
 public class CreateSubAnagramFile implements Script {
     private final ObjectMapper objectMapper;
     private final SubAnagramFile subAnagramFile;
-    private final String wordPath;
-
-    public CreateSubAnagramFile(ObjectMapper objectMapper, SubAnagramFile subAnagramFile, String wordPath) {
-        this.objectMapper = objectMapper;
-        this.subAnagramFile = subAnagramFile;
-        this.wordPath = wordPath;
-    }
 
     @Override
     public void run() {
+        System.out.println("Creating subAnagram file...");
         List<String> words;
 
         try {
-            words = objectMapper.readValue(new File(wordPath), new TypeReference<>() {
+            words = objectMapper.readValue(new File(FilePaths.WORDS_FILE), new TypeReference<>() {
             });
         } catch (Exception e) {
             e.printStackTrace();
             return;
         }
 
+        int count = 0;
         for (String word : words) {
+
+            if (count > 3) {
+                break;
+            }
+
             if (word.length() < Constants.MIN_WORD_LENGTH || word.length() > Constants.MAX_WORD_LENGTH) {
                 continue;
             }
 
             subAnagramFile.addWordFromFile(word);
+            count++;
         }
 
         ExecutorService executorService = subAnagramFile.getExecutorService();
@@ -48,10 +54,12 @@ public class CreateSubAnagramFile implements Script {
             System.out.println("Get Completed Tasks: " + ((ThreadPoolExecutor) executorService).getCompletedTaskCount());
 
             if (executorService.isTerminated()) {
+                System.out.println("Done creating subAnagram file...");
                 subAnagramFile.saveFile();
                 scheduledExecutor.shutdown();
                 executorService.shutdown();
             }
         }, 0, 10, TimeUnit.SECONDS);
+
     }
 }

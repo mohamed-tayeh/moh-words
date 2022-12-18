@@ -1,5 +1,8 @@
 package com.mohamedtayeh.wosbot.features.constants;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class FilePaths {
     public static final String CHANNELS_FILE_NAME = "src/main/resources/channels.json";
     public static final String CONFIG_FILE_NAME = "src/main/resources/config.json";

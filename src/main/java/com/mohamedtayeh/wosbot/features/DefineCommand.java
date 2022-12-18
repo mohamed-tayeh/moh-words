@@ -6,24 +6,25 @@ import com.mohamedtayeh.wosbot.features.constants.Constants;
 import com.mohamedtayeh.wosbot.features.constants.Responses;
 import com.mohamedtayeh.wosbot.features.dictionaryApi.DictionaryApi;
 import com.mohamedtayeh.wosbot.features.messageHelper.MessageHelper;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.HashSet;
 
+@Service
+@NonNull
+@RequiredArgsConstructor
 public class DefineCommand extends Command {
     private final HashSet<String> cmdSet = new HashSet<>(Arrays.asList("!define"));
     private final MessageHelper messageHelper;
     private final DictionaryApi dictionaryApi;
+    
 
-    /**
-     * Register events of this class with the EventManager/EventHandler
-     *
-     * @param eventHandler SimpleEventHandler
-     */
-    public DefineCommand(SimpleEventHandler eventHandler, DictionaryApi dictionaryApi, MessageHelper messageHelper) {
-        eventHandler.onEvent(ChannelMessageEvent.class, this::onChannelMessage);
-        this.dictionaryApi = dictionaryApi;
-        this.messageHelper = messageHelper;
+    @Override
+    public void handleEvent(SimpleEventHandler event) {
+        event.onEvent(ChannelMessageEvent.class, this::onChannelMessage);
     }
 
     /**

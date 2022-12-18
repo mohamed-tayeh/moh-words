@@ -4,18 +4,21 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mohamedtayeh.wosbot.features.anagramHelper.AnagramHelper;
 import com.mohamedtayeh.wosbot.features.constants.FilePaths;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Service
 public class AnagramFile {
     private final ObjectMapper objectMapper;
     private final AnagramHelper anagramHelper;
-    private volatile HashMap<String, TreeSet<String>> anagrams;
+    private volatile HashMap<String, Set<String>> anagrams;
 
-    public AnagramFile(ObjectMapper objectMapper, AnagramHelper anagramHelper) {
+    public AnagramFile(@Autowired ObjectMapper objectMapper, @Autowired AnagramHelper anagramHelper) {
         this.objectMapper = objectMapper;
         this.anagramHelper = anagramHelper;
         readFile();
@@ -52,7 +55,7 @@ public class AnagramFile {
      *
      * @return the anagrams object
      */
-    public HashMap<String, TreeSet<String>> getAnagrams() {
+    public HashMap<String, Set<String>> getAnagrams() {
         return anagrams;
     }
 

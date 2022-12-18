@@ -7,6 +7,8 @@ import com.mohamedtayeh.wosbot.features.anagramHelper.AnagramHelper;
 import com.mohamedtayeh.wosbot.features.constants.Constants;
 import com.mohamedtayeh.wosbot.features.constants.FilePaths;
 import com.mohamedtayeh.wosbot.features.subAnagramFile.Exceptions.InvalidSubAnagram;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,9 +16,7 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-/**
- * This class is responsible for reading and writing to the subAnagrams file
- */
+@Service
 public class SubAnagramFile {
     private final ObjectMapper objectMapper;
     private final AnagramHelper anagramHelper;
@@ -24,7 +24,7 @@ public class SubAnagramFile {
     private final ExecutorService executorService;
     private volatile HashMap<String, HashMap<Integer, TreeSet<String>>> subAnagrams;
 
-    public SubAnagramFile(ObjectMapper objectMapper, AnagramHelper anagramHelper, AnagramFile anagramFile) {
+    public SubAnagramFile(@Autowired ObjectMapper objectMapper, @Autowired AnagramHelper anagramHelper, @Autowired AnagramFile anagramFile) {
         this.objectMapper = objectMapper;
         this.anagramHelper = anagramHelper;
         this.anagramFile = anagramFile;
@@ -36,7 +36,6 @@ public class SubAnagramFile {
     public ExecutorService getExecutorService() {
         return executorService;
     }
-
 
     /**
      * Gets the subAnagrams of a letters
@@ -140,9 +139,7 @@ public class SubAnagramFile {
 
         subAnagrams.put(hash, new HashMap<>());
 
-        executorService.execute(() -> {
-            computeSubAnagrams(word);
-        });
+        executorService.execute(() -> computeSubAnagrams(word));
     }
 
     /**
@@ -153,7 +150,7 @@ public class SubAnagramFile {
      * @param subAnagram the subAnagram to add to word
      */
     public void addSubAnagram(String word, String subAnagram) throws InvalidSubAnagram {
-        if (!isSubAnagramOfWord(word, subAnagram)) {
+        if (!anagramHelper.isSubAnagramOfWord(word, subAnagram)) {
             throw new InvalidSubAnagram("The subAnagram " + subAnagram + " is not a subAnagram of " + word);
         }
 
@@ -229,7 +226,7 @@ public class SubAnagramFile {
      * @param letters the letters to compute the subAnagrams of
      */
     private void computeSubAnagrams(String letters) {
-        Set<String> subAnagramsSet = anagramFile.getAnagrams(allSubsets(letters));
+        Set<String> subAnagramsSet = anagramFile.getAnagrams(anagramHelper.allSubsets(letters));
         HashMap<Integer, TreeSet<String>> subAnagramsByLen = new HashMap<>();
 
         for (String anagram : subAnagramsSet) {
@@ -245,67 +242,6 @@ public class SubAnagramFile {
         }
 
         this.subAnagrams.put(anagramHelper.lettersToHash(letters), subAnagramsByLen);
-    }
-
-    /**
-     * Get all possible subsets of letters
-     *
-     * @param letters to get the subsets from
-     * @return list of subsets
-     */
-    private List<String> allSubsets(String letters) {
-        List<String> subsets = new ArrayList<>();
-        Stack<String> currSubset = new Stack<>();
-        subsetDfs(letters, subsets, currSubset, 0);
-        return subsets;
-    }
-
-    /**
-     * Helper function for allSubsets method
-     *
-     * @param letters to get the subsets from
-     * @param res     the list to add the subsets to
-     * @param curr    the current subset
-     * @param index   the current index being traversed
-     */
-    private void subsetDfs(String letters, List<String> res, Stack<String> curr, Integer index) {
-        if (index == letters.length() && curr.size() < 4) {
-            return;
-        }
-
-        if (index == letters.length()) {
-            res.add(String.join("", curr));
-            return;
-        }
-
-        curr.add(String.valueOf(letters.charAt(index)));
-        subsetDfs(letters, res, curr, index + 1);
-
-        curr.pop();
-        subsetDfs(letters, res, curr, index + 1);
-    }
-
-
-    private Boolean isSubAnagramOfWord(String word, String subAnagram) {
-        Map<Character, Integer> wordMap = new HashMap<>();
-        Map<Character, Integer> subAnagramMap = new HashMap<>();
-
-        for (char c : word.toCharArray()) {
-            wordMap.put(c, wordMap.getOrDefault(c, 0) + 1);
-        }
-
-        for (char c : subAnagram.toCharArray()) {
-            subAnagramMap.put(c, subAnagramMap.getOrDefault(c, 0) + 1);
-        }
-
-        for (char k : wordMap.keySet()) {
-            if (wordMap.get(k) > subAnagramMap.getOrDefault(k, 0)) {
-                return false;
-            }
-        }
-
-        return true;
-
     }
 
     /**
