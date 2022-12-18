@@ -1,7 +1,9 @@
 package com.mohamedtayeh.wosbot.features.messageHelper;
 
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
+import org.springframework.stereotype.Service;
 
+@Service
 public class MessageHelper {
     /**
      * Parse the message based on space

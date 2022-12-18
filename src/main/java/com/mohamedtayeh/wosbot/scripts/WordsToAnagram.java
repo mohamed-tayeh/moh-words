@@ -4,6 +4,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mohamedtayeh.wosbot.features.anagramHelper.AnagramHelper;
 import com.mohamedtayeh.wosbot.features.constants.Constants;
+import com.mohamedtayeh.wosbot.features.constants.FilePaths;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.util.HashMap;
@@ -11,20 +14,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class WordsToAnagram implements Script {
+@Service
+@RequiredArgsConstructor
+public class WordsToAnagram {
     private final ObjectMapper objectMapper;
     private final AnagramHelper anagramHelper;
-    private final String sourcePath;
-    private final String destPath;
 
-    public WordsToAnagram(ObjectMapper objectMapper, AnagramHelper anagramHelper, String sourcePath, String destPath) {
-        this.objectMapper = objectMapper;
-        this.anagramHelper = anagramHelper;
-        this.sourcePath = sourcePath;
-        this.destPath = destPath;
-    }
-
-    @Override
     public void run() {
         wordListToAnagramStruct();
     }
@@ -36,7 +31,7 @@ public class WordsToAnagram implements Script {
         List<String> words;
 
         try {
-            words = objectMapper.readValue(new File(sourcePath), new TypeReference<>() {
+            words = objectMapper.readValue(new File(FilePaths.WORDS_FILE), new TypeReference<>() {
             });
         } catch (Exception e) {
             e.printStackTrace();
@@ -62,7 +57,7 @@ public class WordsToAnagram implements Script {
         }
 
         try {
-            objectMapper.writeValue(new File(destPath), anagrams);
+            objectMapper.writeValue(new File(FilePaths.ANAGRAM_FILE), anagrams);
         } catch (Exception e) {
             e.printStackTrace();
         }

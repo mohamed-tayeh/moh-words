@@ -7,28 +7,25 @@ import com.mohamedtayeh.wosbot.features.constants.Responses;
 import com.mohamedtayeh.wosbot.features.dictionaryApi.DictionaryApi;
 import com.mohamedtayeh.wosbot.features.messageHelper.MessageHelper;
 import com.mohamedtayeh.wosbot.features.subAnagramFile.SubAnagramFile;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
 
+@Service
+@NonNull
+@RequiredArgsConstructor
 public class AddWordCommand extends Command {
     private static final HashSet<String> cmdSet = new HashSet<String>(List.of("!addw", "!addword"));
     private final MessageHelper messageHelper;
     private final SubAnagramFile subAnagramFile;
     private final DictionaryApi dictionaryApi;
 
-
-    /**
-     * Register events of this class with the EventManager/EventHandler
-     *
-     * @param eventHandler SimpleEventHandler
-     */
-    public AddWordCommand(SimpleEventHandler eventHandler, SubAnagramFile subAnagramFile, MessageHelper messageHelper, DictionaryApi dictionaryApi) {
-        this.subAnagramFile = subAnagramFile;
-        this.messageHelper = messageHelper;
-        this.dictionaryApi = dictionaryApi;
-
-        eventHandler.onEvent(ChannelMessageEvent.class, this::onChannelMessage);
+    @Override
+    public void handleEvent(SimpleEventHandler event) {
+        event.onEvent(ChannelMessageEvent.class, this::onChannelMessage);
     }
 
     /**

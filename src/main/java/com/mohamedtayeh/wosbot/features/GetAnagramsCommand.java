@@ -6,27 +6,26 @@ import com.mohamedtayeh.wosbot.features.anagramFile.AnagramFile;
 import com.mohamedtayeh.wosbot.features.constants.Constants;
 import com.mohamedtayeh.wosbot.features.constants.Responses;
 import com.mohamedtayeh.wosbot.features.messageHelper.MessageHelper;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
+@Service
+@NonNull
+@RequiredArgsConstructor
 public class GetAnagramsCommand extends Command {
     private static final List<String> cmds = Arrays.asList("!anagram", "!anagrams");
     private static final HashSet<String> cmdSet = new HashSet<String>(cmds);
     private final AnagramFile anagramFile;
     private final MessageHelper messageHelper;
 
-
-    /**
-     * Register events of this class with the EventManager/EventHandler
-     *
-     * @param eventHandler SimpleEventHandler
-     */
-    public GetAnagramsCommand(SimpleEventHandler eventHandler, AnagramFile anagramFile, MessageHelper messageHelper) {
-        eventHandler.onEvent(ChannelMessageEvent.class, this::onChannelMessage);
-        this.anagramFile = anagramFile;
-        this.messageHelper = messageHelper;
+    @Override
+    public void handleEvent(SimpleEventHandler event) {
+        event.onEvent(ChannelMessageEvent.class, this::onChannelMessage);
     }
 
     /**
@@ -61,4 +60,6 @@ public class GetAnagramsCommand extends Command {
         res = String.format(Responses.ANAGRAMS_RES, msgSplit[1], anagrams);
         this.say(event, res);
     }
+
+
 }

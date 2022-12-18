@@ -1,5 +1,8 @@
 package com.mohamedtayeh.wosbot.features.constants;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class Constants {
     public static final String COMMAND_PREFIX = "!";
     public static final Integer MAX_WORD_LENGTH = 15;

@@ -2,27 +2,33 @@ package com.mohamedtayeh.wosbot.features;
 
 import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
+import com.mohamedtayeh.wosbot.db.SubAnagram.SubAnagramController;
 import com.mohamedtayeh.wosbot.features.constants.Constants;
 import com.mohamedtayeh.wosbot.features.constants.Responses;
 import com.mohamedtayeh.wosbot.features.messageHelper.MessageHelper;
-import com.mohamedtayeh.wosbot.features.subAnagramFile.SubAnagramFile;
 import com.mohamedtayeh.wosbot.features.wordApi.WordApi;
+import com.mohamedtayeh.wosbot.features.wordApi.responses.AnagramRes;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.concurrent.CompletableFuture;
 
+@Service
+@NonNull
+@RequiredArgsConstructor
 public class GetWordsCommand extends Command {
     private static final HashSet<String> cmdSet = new HashSet<>(Arrays.asList("!word", "!words"));
 
     private final MessageHelper messageHelper;
     private final WordApi wordApi;
-    private final SubAnagramFile subAnagramFile;
+    private final SubAnagramController subAnagramController;
 
-    public GetWordsCommand(SimpleEventHandler eventHandler, WordApi wordApi, MessageHelper messageHelper, SubAnagramFile subAnagramFile) {
-        this.messageHelper = messageHelper;
-        this.wordApi = wordApi;
-        this.subAnagramFile = subAnagramFile;
-        eventHandler.onEvent(ChannelMessageEvent.class, this::onChannelMessage);
+    @Override
+    public void handleEvent(SimpleEventHandler event) {
+        event.onEvent(ChannelMessageEvent.class, this::onChannelMessage);
     }
 
     /**
@@ -79,19 +85,11 @@ public class GetWordsCommand extends Command {
             return;
         }
 
-        this.say(event, getSubAnagrams(word, minLength, maxLength));
+        commandResByDB(event, word, minLength, maxLength);
+//        commandResByApi(event, word, minLength, maxLength);
     }
 
-
-    /**
-     * Get the all the subAnagrams from the given letters
-     *
-     * @param letters   used to make the subAnagrams
-     * @param minLength min length
-     * @param maxLength max length
-     * @return A string of subAnagrams sorted in descending order and alphabetical order second
-     */
-    private String getSubAnagrams(String letters, Integer minLength, Integer maxLength) {
+    private void commandResByDB(ChannelMessageEvent event, String word, Integer minLength, Integer maxLength) {
 
         if (minLength == null) {
             minLength = Constants.MIN_WORD_LENGTH;
@@ -101,18 +99,48 @@ public class GetWordsCommand extends Command {
             maxLength = Constants.MAX_WORD_LENGTH;
         }
 
-        try {
-            String subAnagrams = subAnagramFile.getAnagramsString(letters, minLength, maxLength);
+        String res = subAnagramController.getSubAnagramsString(word, minLength, maxLength);
+        res = handleRes(res, word);
+        this.say(event, res);
 
-            if (subAnagrams.isEmpty()) {
-                return String.format(Responses.SUB_NO_ANAGRAMS_RES, letters);
-            }
+    }
 
-            return String.format(Responses.SUB_ANAGRAMS_RES, letters, subAnagrams);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            System.out.println("Error: " + ex.getMessage());
-            return Responses.UNKNOWN_ERROR;
+    private void commandResByApi(ChannelMessageEvent event, String word, Integer minLength, Integer maxLength) {
+        getSubAnagrams(word, minLength, maxLength)
+                .thenApply(res -> handleRes(res, word))
+                .thenAccept(res -> this.say(event, res));
+    }
+
+    private String handleRes(String subAnagrams, String word) {
+        if (subAnagrams.isEmpty()) {
+            return String.format(Responses.SUB_NO_ANAGRAMS_RES, word);
         }
+
+        return String.format(Responses.SUB_ANAGRAMS_RES, word, subAnagrams);
+
+    }
+
+    /**
+     * Get the all the subAnagrams from the given letters
+     *
+     * @param letters   used to make the subAnagrams
+     * @param minLength min length
+     * @param maxLength max length
+     * @return A string of subAnagrams sorted in descending order and alphabetical order second
+     */
+    private CompletableFuture<String> getSubAnagrams(String letters, Integer minLength, Integer maxLength) {
+
+        if (minLength == null) {
+            minLength = Constants.MIN_WORD_LENGTH;
+        }
+
+        if (maxLength == null) {
+            maxLength = Constants.MAX_WORD_LENGTH;
+        }
+
+        return wordApi
+                .getWords(letters, minLength, maxLength)
+                .thenApply(AnagramRes::getAnagramsString);
+
     }
 }

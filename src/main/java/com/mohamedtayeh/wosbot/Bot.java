@@ -7,43 +7,42 @@ import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import com.github.twitch4j.ITwitchClient;
 import com.github.twitch4j.TwitchClientBuilder;
 import com.mohamedtayeh.wosbot.features.*;
-import com.mohamedtayeh.wosbot.features.anagramFile.AnagramFile;
-import com.mohamedtayeh.wosbot.features.anagramHelper.AnagramHelper;
 import com.mohamedtayeh.wosbot.features.constants.FilePaths;
-import com.mohamedtayeh.wosbot.features.dictionaryApi.DictionaryApi;
-import com.mohamedtayeh.wosbot.features.messageHelper.MessageHelper;
-import com.mohamedtayeh.wosbot.features.subAnagramFile.SubAnagramFile;
-import com.mohamedtayeh.wosbot.features.wordApi.WordApi;
+import jakarta.annotation.PostConstruct;
+import lombok.NonNull;
+import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.util.List;
 
+@Service
+@NonNull
 public class Bot {
     /**
      * Twitch4J API
      */
     private final ITwitchClient twitchClient;
+    private final AddWordCommand AddWordCommand;
+    private final AddAnagramCommand AddAnagramCommand;
+    private final DefineCommand DefineCommand;
+    private final GetAnagramsCommand GetAnagramsCommand;
+    private final GetWordsCommand GetWordsCommand;
     /**
      * Holds the Bot Configuration
      */
     private Configuration configuration;
 
-    /**
-     * Constructor
-     */
-    public Bot() {
+    public Bot(AddWordCommand AddWordCommand, AddAnagramCommand AddAnagramCommand, DefineCommand DefineCommand, GetAnagramsCommand GetAnagramsCommand, GetWordsCommand GetWordsCommand) {
         // Load Configuration
         loadConfiguration();
 
         TwitchClientBuilder clientBuilder = TwitchClientBuilder.builder();
 
-        // region Auth
         OAuth2Credential credential = new OAuth2Credential(
                 "twitch",
                 configuration.getCredentials().get("irc"));
-        // endregion
 
-        // region TwitchClient
+
         twitchClient = clientBuilder
                 .withClientId(configuration.getApi().get("twitch_client_id"))
                 .withClientSecret(configuration.getApi().get("twitch_client_secret"))
@@ -59,32 +58,26 @@ public class Bot {
                  * Build the TwitchClient Instance
                  */
                 .build();
-        // endregion
-    }
 
+        this.AddWordCommand = AddWordCommand;
+        this.AddAnagramCommand = AddAnagramCommand;
+        this.DefineCommand = DefineCommand;
+        this.GetAnagramsCommand = GetAnagramsCommand;
+        this.GetWordsCommand = GetWordsCommand;
+    }
+    
     /**
      * Method to register all features
      */
+    @PostConstruct
     public void registerFeatures() {
+        // Register Event Handlers
         SimpleEventHandler eventHandler = twitchClient.getEventManager().getEventHandler(SimpleEventHandler.class);
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        AnagramHelper anagramHelper = new AnagramHelper();
-        AnagramFile anagramFile = new AnagramFile(objectMapper, anagramHelper);
-        SubAnagramFile subAnagramFile = new SubAnagramFile(objectMapper, anagramHelper, anagramFile);
-
-        WordApi wordApi = new WordApi(objectMapper);
-        DictionaryApi dictionaryApi = new DictionaryApi(objectMapper);
-
-        MessageHelper messageHelper = new MessageHelper();
-
-        new GetWordsCommand(eventHandler, wordApi, messageHelper, subAnagramFile);
-        new GetAnagramsCommand(eventHandler, anagramFile, messageHelper);
-
-        new DefineCommand(eventHandler, dictionaryApi, messageHelper);
-
-        new AddWordCommand(eventHandler, subAnagramFile, messageHelper, dictionaryApi);
-        new AddAnagramCommand(eventHandler, subAnagramFile, messageHelper, dictionaryApi);
+        AddWordCommand.handleEvent(eventHandler);
+        AddAnagramCommand.handleEvent(eventHandler);
+        DefineCommand.handleEvent(eventHandler);
+        GetAnagramsCommand.handleEvent(eventHandler);
+        GetWordsCommand.handleEvent(eventHandler);
     }
 
     /**
