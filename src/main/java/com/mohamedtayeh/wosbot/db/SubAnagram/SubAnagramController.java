@@ -87,8 +87,6 @@ public class SubAnagramController {
     }
 
     /**
-     * Get subAnagram by letters
-     *
      * @param hash to get the subAnagrams
      * @return Map of subAnagrams by indexed by length
      */
