@@ -15,7 +15,6 @@ public class AnagramHelper {
      * @return hash of the letters
      */
     public String lettersToHash(String letters) {
-        letters = letters.toLowerCase();
         int[] charCount = new int[26];
         for (int i = 0; i < letters.length(); i++) {
             int index = letters.charAt(i) - 'a';
@@ -24,6 +23,7 @@ public class AnagramHelper {
             }
             charCount[index]++;
         }
+
         return Arrays.toString(charCount);
     }
 
@@ -34,7 +34,7 @@ public class AnagramHelper {
      * @return list of all possible hashes
      * @throws TooManyWildCards if there
      */
-    public List<String> getHashesFromWildCard(String letters) throws TooManyWildCards {
+    public List<String> getLettersFromWildCard(String letters) throws TooManyWildCards {
 
         int wildCardCount = 0;
         for (int i = 0; i < letters.length(); i++) {
@@ -47,7 +47,7 @@ public class AnagramHelper {
             throw new TooManyWildCards("Too many wild cards");
         }
 
-        return getHashesFromWildCardHelper(letters);
+        return getLettersFromWildCardHelper(letters);
     }
 
     /**
@@ -56,20 +56,20 @@ public class AnagramHelper {
      * @param letters to find the possibilities from
      * @return a list of all possible hashes
      */
-    public List<String> getHashesFromWildCardHelper(String letters) {
+    private List<String> getLettersFromWildCardHelper(String letters) {
 
         List<String> hashes = new ArrayList<>();
         for (int i = 0; i < letters.length(); i++) {
             if (letters.charAt(i) == Constants.WILD_CARD) {
                 for (int j = 0; j < 26; j++) {
                     String newLetters = letters.substring(0, i) + (char) (j + 'a') + letters.substring(i + 1);
-                    hashes.addAll(getHashesFromWildCardHelper(newLetters));
+                    hashes.addAll(getLettersFromWildCardHelper(newLetters));
                 }
                 return hashes;
             }
         }
 
-        hashes.add(lettersToHash(letters));
+        hashes.add(letters);
         return hashes;
     }
 
@@ -107,7 +107,7 @@ public class AnagramHelper {
         }
 
         for (char k : wordMap.keySet()) {
-            if (wordMap.get(k) > subAnagramMap.getOrDefault(k, 0)) {
+            if (wordMap.get(k) < subAnagramMap.getOrDefault(k, 0)) {
                 return false;
             }
         }
