@@ -2,11 +2,11 @@ package com.mohamedtayeh.wosbot.features;
 
 import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
+import com.mohamedtayeh.wosbot.db.SubAnagram.SubAnagramController;
 import com.mohamedtayeh.wosbot.features.constants.Constants;
 import com.mohamedtayeh.wosbot.features.constants.Responses;
 import com.mohamedtayeh.wosbot.features.dictionaryApi.DictionaryApi;
 import com.mohamedtayeh.wosbot.features.messageHelper.MessageHelper;
-import com.mohamedtayeh.wosbot.features.subAnagramFile.SubAnagramFile;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,8 +20,8 @@ import java.util.List;
 public class AddWordCommand extends Command {
     private static final HashSet<String> cmdSet = new HashSet<String>(List.of("!addw", "!addword"));
     private final MessageHelper messageHelper;
-    private final SubAnagramFile subAnagramFile;
     private final DictionaryApi dictionaryApi;
+    private final SubAnagramController subAnagramController;
 
     @Override
     public void handleEvent(SimpleEventHandler event) {
@@ -46,7 +46,7 @@ public class AddWordCommand extends Command {
 
         String word = msgSplit[1].toLowerCase();
 
-        if (subAnagramFile.containsWord(word)) {
+        if (subAnagramController.containsWord(word)) {
             this.say(event, String.format(Responses.WORD_EXISTS, event.getUser().getName()));
             return;
         }
@@ -55,7 +55,7 @@ public class AddWordCommand extends Command {
                 .isWord(word)
                 .thenAccept(isWord -> {
                     if (isWord) {
-                        subAnagramFile.addWord(word);
+                        subAnagramController.addWord(word);
                         this.say(event, String.format(Responses.WORD_ADDED, event.getUser().getName()));
                         return;
                     }
