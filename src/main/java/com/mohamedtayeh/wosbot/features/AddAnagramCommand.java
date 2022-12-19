@@ -64,11 +64,10 @@ public class AddAnagramCommand extends Command {
         }
 
         if (!subAnagramController.containsWord(word)) { // add both word and subAnagram as words
-            this.say(event, String.format(Responses.WORD_NOT_FOUND, event.getUser().getName(), word));
+            this.say(event, String.format(Responses.WORD_NOT_FOUND, word, event.getUser().getName()));
             return;
         }
-
-
+        
         if (subAnagramController.containsSubAnagram(word, subAnagram)) {
             this.say(event, String.format(Responses.ANAGRAM_ALREADY_EXISTS, event.getUser().getName()));
             return;
