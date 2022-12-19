@@ -20,7 +20,7 @@ public class Responses {
     public static final String INVALID_MIN_LENGTH = "@%s The minimum length parameter must be smaller than the word!";
     public static final String INVALID_LENGTH_ORDER = "@%s The minimum length parameter must be smaller than the maximum length parameter!";
 
-    public static final String WORD_ADDED = "Word has been added to our dictionary @%s!";
+    public static final String WORD_ADDED = "Word has been added to our dictionary, thank you @%s!";
     public static final String WORD_EXISTS = "Word is already in the dictionary @%s ;)";
     public static final String WORD_NOT_FOUND = "I couldn't find the word \"%s\" in the dictionary @%s please add it using !addw word-here";
     public static final String NOT_A_WORD = "Looks like \"%s\" is not a valid word in the dictionary @%s 🤔";
