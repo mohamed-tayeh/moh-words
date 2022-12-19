@@ -2,12 +2,12 @@ package com.mohamedtayeh.wosbot.features;
 
 import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
+import com.mohamedtayeh.wosbot.db.SubAnagram.Exceptions.InvalidSubAnagram;
+import com.mohamedtayeh.wosbot.db.SubAnagram.SubAnagramController;
 import com.mohamedtayeh.wosbot.features.constants.Constants;
 import com.mohamedtayeh.wosbot.features.constants.Responses;
 import com.mohamedtayeh.wosbot.features.dictionaryApi.DictionaryApi;
 import com.mohamedtayeh.wosbot.features.messageHelper.MessageHelper;
-import com.mohamedtayeh.wosbot.features.subAnagramFile.Exceptions.InvalidSubAnagram;
-import com.mohamedtayeh.wosbot.features.subAnagramFile.SubAnagramFile;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,9 +21,8 @@ import java.util.List;
 public class AddAnagramCommand extends Command {
     private static final HashSet<String> cmdSet = new HashSet<>(List.of("!addanagram", "!adda"));
     private final MessageHelper messageHelper;
-    private final SubAnagramFile subAnagramFile;
+    private final SubAnagramController subAnagramController;
     private final DictionaryApi dictionaryApi;
-
 
     @Override
     public void handleEvent(SimpleEventHandler event) {
@@ -46,13 +45,13 @@ public class AddAnagramCommand extends Command {
             return;
         }
 
-        if (msgSplit.length == 2) {
+        if (msgSplit.length < 3) {
             this.say(event, String.format(Responses.ADD_ANAGRAM_HELP, event.getUser().getName()));
             return;
         }
 
-        String word = msgSplit[1].toLowerCase();
-        String subAnagram = msgSplit[2].toLowerCase();
+        String word = msgSplit[1];
+        String subAnagram = msgSplit[2];
 
         if (subAnagram.length() > word.length()) {
             this.say(event, String.format(Responses.SUB_ANAGRAM_TOO_LONG, event.getUser().getName()));
@@ -64,12 +63,13 @@ public class AddAnagramCommand extends Command {
             return;
         }
 
-        if (!subAnagramFile.containsWord(word)) {
+        if (!subAnagramController.containsWord(word)) { // add both word and subAnagram as words
             this.say(event, String.format(Responses.WORD_NOT_FOUND, event.getUser().getName(), word));
             return;
         }
 
-        if (subAnagramFile.containsSubAnagram(word, subAnagram)) {
+
+        if (subAnagramController.containsSubAnagram(word, subAnagram)) {
             this.say(event, String.format(Responses.ANAGRAM_ALREADY_EXISTS, event.getUser().getName()));
             return;
         }
@@ -83,7 +83,7 @@ public class AddAnagramCommand extends Command {
                     }
 
                     try {
-                        subAnagramFile.addSubAnagram(word, subAnagram);
+                        subAnagramController.addSubAnagram(word, subAnagram);
                     } catch (InvalidSubAnagram e) {
                         this.say(event, String.format(Responses.ANAGRAM_NOT_VALID, event.getUser().getName()));
                         return;
