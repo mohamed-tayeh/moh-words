@@ -22,15 +22,19 @@ public class Bot {
      * Twitch4J API
      */
     private final ITwitchClient twitchClient;
-    private final DefineCommand DefineCommand;
-    private final GetAnagramsCommand GetAnagramsCommand;
-    private final GetWordsCommand GetWordsCommand;
+    private final GetWordsCommand getWordsCommand;
+    private final DefineCommand defineCommand;
+    private final GetAnagramsCommand getAnagramsCommand;
+    private final AddAnagramCommand addAnagramCommand;
+    private final AddWordCommand addWordCommand;
+
     /**
      * Holds the Bot Configuration
      */
     private Configuration configuration;
 
-    public Bot(DefineCommand DefineCommand, GetAnagramsCommand GetAnagramsCommand, GetWordsCommand GetWordsCommand) {
+    public Bot(DefineCommand defineCommand, GetAnagramsCommand getAnagramsCommand, GetWordsCommand getWordsCommand,
+               AddAnagramCommand addAnagramCommand, AddWordCommand addWordCommand) {
         // Load Configuration
         loadConfiguration();
 
@@ -57,9 +61,11 @@ public class Bot {
                  */
                 .build();
 
-        this.DefineCommand = DefineCommand;
-        this.GetAnagramsCommand = GetAnagramsCommand;
-        this.GetWordsCommand = GetWordsCommand;
+        this.defineCommand = defineCommand;
+        this.getAnagramsCommand = getAnagramsCommand;
+        this.getWordsCommand = getWordsCommand;
+        this.addAnagramCommand = addAnagramCommand;
+        this.addWordCommand = addWordCommand;
     }
 
     /**
@@ -69,9 +75,11 @@ public class Bot {
     public void registerFeatures() {
         // Register Event Handlers
         SimpleEventHandler eventHandler = twitchClient.getEventManager().getEventHandler(SimpleEventHandler.class);
-        DefineCommand.handleEvent(eventHandler);
-        GetAnagramsCommand.handleEvent(eventHandler);
-        GetWordsCommand.handleEvent(eventHandler);
+        defineCommand.handleEvent(eventHandler);
+        getAnagramsCommand.handleEvent(eventHandler);
+        getWordsCommand.handleEvent(eventHandler);
+        addAnagramCommand.handleEvent(eventHandler);
+        addWordCommand.handleEvent(eventHandler);
     }
 
     /**
