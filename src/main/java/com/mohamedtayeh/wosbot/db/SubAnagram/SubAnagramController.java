@@ -6,30 +6,83 @@ import com.mohamedtayeh.wosbot.features.anagramHelper.AnagramHelper;
 import com.mohamedtayeh.wosbot.features.constants.Constants;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
 @NonNull
 public class SubAnagramController {
     private final AnagramController anagramController;
-    private final ExecutorService executorService = Executors.newFixedThreadPool(3);
+    private final ExecutorService executorService = Executors.newFixedThreadPool(2);
+    private final ExecutorService saveToDb = Executors.newSingleThreadExecutor();
     private SubAnagramRepository subAnagramRepository;
     private AnagramHelper anagramHelper;
 
-    public String getSubAnagramsString(String word, Integer minLength, Integer maxLength) {
-        String hash = anagramHelper.lettersToHash(word);
-        Map<Integer, TreeSet<String>> subAnagramsByLen = getSubAnagramByHash(hash);
+    public CompletableFuture<String> getSubAnagramsString(String word, Integer minLength, Integer maxLength) {
 
-        if (subAnagramsByLen.isEmpty()) {
-            subAnagramsByLen = getAnagramsByComputation(word);
+        return CompletableFuture.supplyAsync(() -> {
+            Map<String, String> hashToWord = new HashMap<>();
+
+            Set<String> hashes = anagramHelper
+                    .getLettersFromWildCard(word)
+                    .stream()
+                    .map(currWord -> {
+                        String hash = anagramHelper.lettersToHash(currWord);
+                        hashToWord.put(hash, currWord);
+                        return hash;
+                    })
+                    .collect(Collectors.toSet());
+
+            HashMap<Integer, TreeSet<String>> subAnagramsMap = new HashMap<>();
+
+            subAnagramRepository
+                    .findAllById(hashes)
+                    .forEach(knownSubAnagram -> {
+                        Map<Integer, TreeSet<String>> subAnagramsByLen = knownSubAnagram.getValue();
+                        consolidateSubAnagramMap(word, minLength, subAnagramsMap, subAnagramsByLen);
+                        hashes.remove(knownSubAnagram.getId());
+                    });
+
+            List<SubAnagram> newSubAnagrams = new ArrayList<>();
+
+            hashes.parallelStream()
+                    .forEach(hash -> {
+                        Map<Integer, TreeSet<String>> subAnagramsByLen = getAnagramsByComputation(hashToWord.get(hash));
+                        newSubAnagrams.add(new SubAnagram(hash, subAnagramsByLen));
+                        consolidateSubAnagramMap(word, minLength, subAnagramsMap, subAnagramsByLen);
+                    });
+
+            saveToDb.submit(() -> {
+                subAnagramRepository.saveAll(newSubAnagrams);
+            });
+
+            return subAnagramMapToString(word, minLength, maxLength, subAnagramsMap);
+        }, executorService);
+    }
+
+    private synchronized void consolidateSubAnagramMap(String word, Integer minLength, HashMap<Integer, TreeSet<String>> subAnagramsMap, Map<Integer, TreeSet<String>> subAnagramsByLen) {
+        for (int i = word.length(); i >= minLength; i--) {
+            if (subAnagramsByLen.containsKey(i)) {
+
+                if (!subAnagramsMap.containsKey(i)) {
+                    subAnagramsMap.put(i, new TreeSet<>());
+                }
+
+                subAnagramsMap.get(i).addAll(subAnagramsByLen.get(i));
+            }
         }
+    }
 
-        if (subAnagramsByLen.isEmpty()) {
+    @NotNull
+    private String subAnagramMapToString(String word, Integer minLength, Integer maxLength, HashMap<Integer, TreeSet<String>> subAnagramsMap) {
+        if (subAnagramsMap.isEmpty()) {
             return "";
         }
 
@@ -37,7 +90,7 @@ public class SubAnagramController {
 
         for (int i = word.length(); i >= Constants.MIN_WORD_LENGTH; i--) {
 
-            if (!subAnagramsByLen.containsKey(i)) {
+            if (!subAnagramsMap.containsKey(i)) {
                 continue;
             }
 
@@ -46,14 +99,15 @@ public class SubAnagramController {
             }
 
             anagrams.add("(" + i + ")");
-            anagrams.addAll(subAnagramsByLen.get(i));
+            anagrams.addAll(subAnagramsMap.get(i));
             anagrams.add("|");
         }
 
-        anagrams.pop(); // the last |
 
+        anagrams.pop(); // the last |
         return String.join(" ", anagrams);
     }
+
 
     /**
      * Gets the subAnagrams of a letters
@@ -126,10 +180,10 @@ public class SubAnagramController {
         if (!anagramHelper.isSubAnagramOfWord(word, subAnagramWord) || word.length() == subAnagramWord.length()) {
             throw new InvalidSubAnagram("The subAnagram " + subAnagramWord + " is not a subAnagram of " + word);
         }
-
+        String hash = anagramHelper.lettersToHash(word);
         SubAnagram subAnagram = subAnagramRepository
-                .findById(anagramHelper.lettersToHash(word))
-                .orElseGet(() -> new SubAnagram(word, new HashMap<>()));
+                .findById(hash)
+                .orElseGet(() -> new SubAnagram(hash, new HashMap<>()));
 
         subAnagram.addSubAnagram(subAnagramWord);
         subAnagramRepository.save(subAnagram);
@@ -146,16 +200,18 @@ public class SubAnagramController {
         String hash = anagramHelper.lettersToHash(word);
         SubAnagram subAnagram = subAnagramRepository
                 .findById(hash)
-                .orElseGet(() -> new SubAnagram(word, new HashMap<>()));
+                .orElseGet(() -> new SubAnagram(hash, new HashMap<>()));
+
+        anagramController.addWord(hash, word);
 
         if (!subAnagram.getValue().isEmpty()) {
             subAnagram.addSubAnagram(word);
+            subAnagramRepository.save(subAnagram);
             return;
         }
 
         // Thus not in the Anagram collection either
         executorService.execute(() -> {
-            anagramController.addWord(word);
             computeSubAnagrams(subAnagram, word);
             subAnagramRepository.save(subAnagram);
         });
@@ -170,6 +226,7 @@ public class SubAnagramController {
         anagramController.getAnagrams(
                 anagramHelper.allSubsets(letters)
         ).forEach(subAnagram::addSubAnagram);
+
     }
 
     public boolean containsWord(String word) {
