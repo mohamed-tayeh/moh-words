@@ -4,7 +4,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mohamedtayeh.wosbot.features.anagramHelper.AnagramHelper;
 import com.mohamedtayeh.wosbot.features.constants.FilePaths;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -13,16 +14,11 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class AnagramFile {
     private final ObjectMapper objectMapper;
     private final AnagramHelper anagramHelper;
     private volatile HashMap<String, Set<String>> anagrams;
-
-    public AnagramFile(@Autowired ObjectMapper objectMapper, @Autowired AnagramHelper anagramHelper) {
-        this.objectMapper = objectMapper;
-        this.anagramHelper = anagramHelper;
-        readFile();
-    }
 
     /**
      * Adds a single word to the anagrams file
@@ -103,6 +99,7 @@ public class AnagramFile {
     /**
      * Reads the anagrams file
      */
+    @PostConstruct
     private void readFile() {
         try {
             anagrams = objectMapper.readValue(new File(FilePaths.ANAGRAM_FILE), new TypeReference<>() {
