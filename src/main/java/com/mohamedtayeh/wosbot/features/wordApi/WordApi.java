@@ -30,7 +30,7 @@ public class WordApi {
 
     private CompletableFuture<AnagramRes> queryWord(String word, Integer minLength, Integer maxLength) {
         HttpClient client = HttpClient.newHttpClient();
-        String uri = String.format(ApiURLS.WORD_API, word, minLength, maxLength);
+        String uri = String.format(ApiURLS.WORD_API, word, minLength - 1, maxLength + 1);
         HttpRequest req = HttpRequest.newBuilder().uri(URI.create(uri)).build();
         return client.sendAsync(req, HttpResponse.BodyHandlers.ofString())
                 .thenApply(HttpResponse::body)
