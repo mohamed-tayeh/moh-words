@@ -51,12 +51,10 @@ public class AnagramController {
                 .getValue();
     }
 
-    public void addWord(String word) {
-        String hash = anagramHelper.lettersToHash(word);
-
+    public void addWord(String hash, String word) {
         Anagram anagram = anagramRespository
                 .findById(hash)
-                .orElseGet(() -> new Anagram("", new TreeSet<>()));
+                .orElseGet(() -> new Anagram(hash, new TreeSet<>()));
 
         anagram.addValue(word);
         anagramRespository.save(anagram);
@@ -69,13 +67,10 @@ public class AnagramController {
      * @return true if word is in the file, false otherwise
      */
     public Boolean containsWord(String word) {
-        String hash = anagramHelper.lettersToHash(word);
-
-        Anagram anagram = anagramRespository
-                .findById(hash)
-                .orElseGet(() -> new Anagram("", new TreeSet<>()));
-
-        return anagram.containsWord(word);
+        return anagramRespository
+                .findById(anagramHelper.lettersToHash(word))
+                .orElseGet(() -> new Anagram("", new TreeSet<>()))
+                .containsWord(word);
     }
 
 }
