@@ -16,4 +16,12 @@ public class Anagram {
     @Id
     private String id;
     private TreeSet<String> value;
+
+    public void addValue(String newValue) {
+        value.add(newValue);
+    }
+
+    public Boolean containsWord(String word) {
+        return value.contains(word);
+    }
 }
