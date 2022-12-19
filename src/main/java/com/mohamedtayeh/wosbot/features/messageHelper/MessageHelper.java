@@ -14,7 +14,11 @@ public class MessageHelper {
     public String[] parseMesssage(ChannelMessageEvent event) {
         String msg = event.getMessage().trim();
         String[] msgSplit = msg.split(" ");
-        msgSplit[0] = msgSplit[0].toLowerCase();
+
+        for (int i = 1; i < msgSplit.length; i++) {
+            msgSplit[i] = msgSplit[i].toLowerCase();
+        }
+
         return msgSplit;
     }
 }

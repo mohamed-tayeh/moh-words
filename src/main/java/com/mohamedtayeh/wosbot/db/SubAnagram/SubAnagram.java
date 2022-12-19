@@ -17,4 +17,12 @@ public class SubAnagram {
     @Id
     private String id;
     private Map<Integer, TreeSet<String>> value;
+
+    public void addSubAnagram(String newWord) {
+        value.get(newWord.length()).add(newWord);
+    }
+
+    public Boolean containsWord(String word) {
+        return value.get(word.length()).contains(word);
+    }
 }

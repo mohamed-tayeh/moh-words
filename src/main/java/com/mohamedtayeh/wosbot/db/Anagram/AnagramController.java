@@ -5,7 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -28,10 +31,51 @@ public class AnagramController {
         return getAnagramsByHash(anagramHelper.lettersToHash(letters));
     }
 
+    public Set<String> getAnagrams(List<String> lettersList) {
+        return anagramRespository.findAllById(
+                        lettersList.stream()
+                                .map(anagramHelper::lettersToHash)
+                                .collect(Collectors.toList())
+                )
+                .stream()
+                .map(Anagram::getValue)
+                .flatMap(Set::stream)
+                .collect(Collectors.toSet());
+
+    }
+
     private TreeSet<String> getAnagramsByHash(String hash) {
         return anagramRespository
                 .findById(hash)
                 .orElseGet(() -> new Anagram("", new TreeSet<>()))
                 .getValue();
     }
+
+    public void addWord(String word) {
+        String hash = anagramHelper.lettersToHash(word);
+
+        Anagram anagram = anagramRespository
+                .findById(hash)
+                .orElseGet(() -> new Anagram("", new TreeSet<>()));
+
+        anagram.addValue(word);
+        anagramRespository.save(anagram);
+    }
+
+    /**
+     * Checks if word is in the file
+     *
+     * @param word to check
+     * @return true if word is in the file, false otherwise
+     */
+    public Boolean containsWord(String word) {
+        String hash = anagramHelper.lettersToHash(word);
+
+        Anagram anagram = anagramRespository
+                .findById(hash)
+                .orElseGet(() -> new Anagram("", new TreeSet<>()));
+
+        return anagram.containsWord(word);
+    }
+
 }

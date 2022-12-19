@@ -2,11 +2,11 @@ package com.mohamedtayeh.wosbot.features.subAnagramFile;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mohamedtayeh.wosbot.db.SubAnagram.Exceptions.InvalidSubAnagram;
 import com.mohamedtayeh.wosbot.features.anagramFile.AnagramFile;
 import com.mohamedtayeh.wosbot.features.anagramHelper.AnagramHelper;
 import com.mohamedtayeh.wosbot.features.constants.Constants;
 import com.mohamedtayeh.wosbot.features.constants.FilePaths;
-import com.mohamedtayeh.wosbot.features.subAnagramFile.Exceptions.InvalidSubAnagram;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -149,6 +149,7 @@ public class SubAnagramFile {
      * @param word       the word to add
      * @param subAnagram the subAnagram to add to word
      */
+    @Deprecated
     public void addSubAnagram(String word, String subAnagram) throws InvalidSubAnagram {
         if (!anagramHelper.isSubAnagramOfWord(word, subAnagram)) {
             throw new InvalidSubAnagram("The subAnagram " + subAnagram + " is not a subAnagram of " + word);
@@ -206,6 +207,7 @@ public class SubAnagramFile {
      * @param anagram to check
      * @return true if it contains the anagram, false otherwise
      */
+    @Deprecated
     public Boolean containsSubAnagram(String word, String anagram) {
 
         String hash = anagramHelper.lettersToHash(word);
