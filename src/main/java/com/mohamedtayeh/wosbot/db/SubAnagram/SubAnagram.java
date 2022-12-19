@@ -6,6 +6,7 @@ import lombok.NonNull;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.TreeSet;
 
@@ -19,7 +20,14 @@ public class SubAnagram {
     private Map<Integer, TreeSet<String>> value;
 
     public void addSubAnagram(String newWord) {
-        value.get(newWord.length()).add(newWord);
+        int length = newWord.length();
+
+        if (value.containsKey(length)) {
+            value.get(length).add(newWord);
+            return;
+        }
+
+        value.put(length, new TreeSet<>(Collections.singletonList(newWord)));
     }
 
     public Boolean containsWord(String word) {

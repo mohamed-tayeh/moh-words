@@ -1,6 +1,7 @@
 package com.mohamedtayeh.wosbot.features;
 
 import com.github.philippheuer.events4j.simple.SimpleEventHandler;
+import com.github.twitch4j.chat.TwitchChat;
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
 
 import java.util.ArrayList;
@@ -21,9 +22,11 @@ public abstract class Command {
     public void say(ChannelMessageEvent event, String msg) {
 
         List<String> messages = splitOnSpaces(msg, 500);
+        String channelName = event.getChannel().getName();
+        TwitchChat twitchChat = event.getTwitchChat();
 
         for (String m : messages) {
-            event.getTwitchChat().sendMessage(event.getChannel().getName(), m);
+            twitchChat.sendMessage(channelName, m);
             try {
                 Thread.sleep(1);
             } catch (InterruptedException e) {
