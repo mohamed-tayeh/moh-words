@@ -6,5 +6,6 @@ import lombok.Data;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
 public class Definition {
-    private String definition = "";
+
+  private String definition = "";
 }

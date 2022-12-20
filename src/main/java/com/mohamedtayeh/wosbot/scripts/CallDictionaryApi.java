@@ -5,15 +5,16 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class CallDictionaryApi implements Script {
-    private final DictionaryApi dictionaryApi;
 
-    public CallDictionaryApi(DictionaryApi dictionaryApi) {
-        this.dictionaryApi = dictionaryApi;
-    }
+  private final DictionaryApi dictionaryApi;
 
-    @Override
-    public void run() {
+  public CallDictionaryApi(DictionaryApi dictionaryApi) {
+    this.dictionaryApi = dictionaryApi;
+  }
 
-        System.out.println(dictionaryApi.isWord("asnfsaf"));
-    }
+  @Override
+  public void run() {
+
+    System.out.println(dictionaryApi.isWord("asnfsaf"));
+  }
 }

@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class RunScript {
 
-    public void run() {
-    }
+  public void run() {
+  }
 
 }
