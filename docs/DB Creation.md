@@ -4,10 +4,10 @@
 
 Word lists needed to be gathered. Resources:
 
-- Python [NLTK Package](https://www.nltk.org/): ~250k words
-- [English GitHub Repo](https://github.com/dwyl/english-words): ~460k words
+- [English GitHub Repo](https://github.com/dwyl/english-words): ~370k words
+- Python [NLTK Package](https://www.nltk.org/): ~260k words
 
-Python NLTK Package was chosen since it didn't have an overkill number of words.
+English GitHub Repo was chosen due to it being an exhaustive list with different verb tenses.
 
 ### Anagram Collection
 
@@ -35,7 +35,8 @@ Result: for each known word
 Limitation:
 
 - End-user can also just give letters that don't form a word
-- To return in O(1), this means that a SubAnagram collection would have to be made from every possible combination of
+- To return in O(1), this means that a SubAnagram collection would have to be made from every
+  possible combination of
   strings
   between the lengths 4 and 15 (inclusive), which would be very computationally and memory taxing.
 
