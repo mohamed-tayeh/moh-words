@@ -9,8 +9,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -19,18 +17,8 @@ public class SubAnagramFile {
   private final ObjectMapper objectMapper;
   private final AnagramHelper anagramHelper;
   private final AnagramFile anagramFile;
-  private final ExecutorService executorService = Executors.newFixedThreadPool(3);
   private volatile HashMap<String, HashMap<Integer, TreeSet<String>>> subAnagrams = new HashMap<>();
-
-  /**
-   * Gets the executor service
-   *
-   * @return the executor service
-   */
-  public ExecutorService getExecutorService() {
-    return executorService;
-  }
-
+  
   /**
    * Adds a word from the words file to the subAnagrams file
    *
@@ -44,8 +32,7 @@ public class SubAnagramFile {
     }
 
     subAnagrams.put(hash, new HashMap<>());
-
-    executorService.execute(() -> computeSubAnagrams(word));
+    computeSubAnagrams(word);
   }
 
   /**
@@ -76,9 +63,11 @@ public class SubAnagramFile {
   /**
    * Write new hashmap to file
    */
-  public synchronized void saveFile() {
+  public void saveFile(int fileNum) {
     try {
-      objectMapper.writeValue(new File(FilePaths.SUB_ANAGRAM_FILE), subAnagrams);
+      objectMapper.writeValue(new File(String.format(FilePaths.SUB_ANAGRAM_FILE, fileNum)),
+          subAnagrams);
+      subAnagrams = new HashMap<>();
     } catch (IOException e) {
       System.out.println("Error saving anagrams file: " + e.getMessage());
     }
