@@ -5,13 +5,16 @@ import com.mohamedtayeh.wosbot.features.constants.Constants;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AnagramHelper {
+
 
   /**
    * Converts a letters to a hash
@@ -20,16 +23,7 @@ public class AnagramHelper {
    * @return hash of the letters
    */
   public String lettersToHash(String letters) {
-    int[] charCount = new int[26];
-    for (int i = 0; i < letters.length(); i++) {
-      int index = letters.charAt(i) - 'a';
-      if (index < 0 || index > 25) {
-        continue;
-      }
-      charCount[index]++;
-    }
-
-    return Arrays.toString(charCount);
+    return Arrays.toString(lettersToCharCount(letters));
   }
 
   /**
@@ -78,6 +72,64 @@ public class AnagramHelper {
     return hashes;
   }
 
+  /**
+   * Get all possible subsets of letters
+   *
+   * @param letters to get the subsets from
+   * @return Set of subsets
+   */
+  public Set<String> allSubsetHashes(String letters) {
+    int[] charCount = lettersToCharCount(letters);
+    Set<String> subsetHashes = new HashSet<>();
+    subsetHashDFS(subsetHashes, charCount, 0, letters.length());
+    return subsetHashes;
+  }
+
+  private void subsetHashDFS(Set<String> subsetHashes, int[] charCount, int currI,
+      int currCharLength) {
+
+    if (currCharLength <= Constants.MIN_WORD_LENGTH - 1) {
+      return;
+    }
+
+    if (currI >= 26) { // must be >= MIN_WORD_LENGTH
+      subsetHashes.add(Arrays.toString(charCount));
+      return;
+    }
+
+    subsetHashDFS(subsetHashes, charCount, currI + 1, currCharLength);
+
+    if (charCount[currI] > 0) {
+      charCount[currI]--;
+
+      if (charCount[currI] > 0) {
+        subsetHashDFS(subsetHashes, charCount, currI, currCharLength - 1);
+      } else {
+        subsetHashDFS(subsetHashes, charCount, currI + 1, currCharLength - 1);
+      }
+
+      charCount[currI]++;
+    }
+  }
+
+  /**
+   * Converts a letters to a charCount array
+   *
+   * @param letters to count the letters of
+   * @return charCount of the letters
+   */
+  private int[] lettersToCharCount(String letters) {
+    int[] charCount = new int[26];
+    for (int i = 0; i < letters.length(); i++) {
+      int index = letters.charAt(i) - 'a';
+      if (index < 0 || index > 25) {
+        continue;
+      }
+      charCount[index]++;
+    }
+
+    return charCount;
+  }
 
   /**
    * Get all possible subsets of letters
