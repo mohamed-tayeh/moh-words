@@ -3,13 +3,10 @@ package com.mohamedtayeh.wosbot.features.subAnagramFile;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mohamedtayeh.wosbot.features.anagramFile.AnagramFile;
 import com.mohamedtayeh.wosbot.features.anagramHelper.AnagramHelper;
-import com.mohamedtayeh.wosbot.features.constants.Constants;
 import com.mohamedtayeh.wosbot.features.constants.FilePaths;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ExecutorService;
@@ -23,7 +20,7 @@ public class SubAnagramFile {
   private final AnagramHelper anagramHelper;
   private final AnagramFile anagramFile;
   private final ExecutorService executorService = Executors.newFixedThreadPool(3);
-  private volatile HashMap<String, HashMap<Integer, TreeSet<String>>> subAnagrams;
+  private volatile HashMap<String, HashMap<Integer, TreeSet<String>>> subAnagrams = new HashMap<>();
 
   /**
    * Gets the executor service
@@ -32,43 +29,6 @@ public class SubAnagramFile {
    */
   public ExecutorService getExecutorService() {
     return executorService;
-  }
-
-  /**
-   * Gets the subAnagrams of a letters
-   *
-   * @param letters the letters to get the subAnagrams of
-   * @return hashmap of anagrams indexed by size
-   */
-  public HashMap<Integer, TreeSet<String>> getAnagrams(String letters) {
-
-    List<String> possibleHashes = anagramHelper.getLettersFromWildCard(letters);
-
-    List<HashMap<Integer, TreeSet<String>>> hashMapList = new LinkedList<>();
-
-    for (String hash : possibleHashes) {
-      if (subAnagrams.containsKey(hash)) {
-        hashMapList.add(subAnagrams.get(hash));
-      }
-    }
-
-    HashMap<Integer, TreeSet<String>> subAnagramsMap = new HashMap<>();
-
-    for (HashMap<Integer, TreeSet<String>> hashMap : hashMapList) {
-      for (int i = letters.length(); i >= Constants.MIN_WORD_LENGTH; i--) {
-
-        if (hashMap.containsKey(i)) {
-
-          if (!subAnagramsMap.containsKey(i)) {
-            subAnagramsMap.put(i, new TreeSet<>());
-          }
-
-          subAnagramsMap.get(i).addAll(hashMap.get(i));
-        }
-      }
-    }
-
-    return new HashMap<>();
   }
 
   /**
@@ -110,7 +70,7 @@ public class SubAnagramFile {
       subAnagramsByLen.put(length, set);
     }
 
-    this.subAnagrams.put(anagramHelper.lettersToHash(letters), subAnagramsByLen);
+    subAnagrams.put(anagramHelper.lettersToHash(letters), subAnagramsByLen);
   }
 
 
