@@ -50,11 +50,7 @@ public class AnagramFile {
    * @return a set of anagrams
    */
   public Set<String> getAnagrams(String letters) {
-    String hash = anagramHelper.lettersToHash(letters);
-    if (anagrams.containsKey(hash)) {
-      return anagrams.get(hash);
-    }
-    return new HashSet<>();
+    return anagrams.getOrDefault(anagramHelper.lettersToHash(letters), new HashSet<>());
   }
 
   /**
@@ -66,6 +62,32 @@ public class AnagramFile {
   public Set<String> getAnagrams(List<String> letters) {
     return letters.stream()
         .map(this::getAnagrams)
+        .flatMap(Set::stream)
+        .collect(Collectors.toSet());
+  }
+
+  /**
+   * Gets a master set for the list of hashes
+   *
+   * @param hashes to get anagrams for
+   * @return a set of anagrams
+   */
+  public Set<String> getAnagramsByHashes(List<String> hashes) {
+    return hashes.stream()
+        .map(hash -> anagrams.getOrDefault(hash, new HashSet<>()))
+        .flatMap(Set::stream)
+        .collect(Collectors.toSet());
+  }
+  
+  /**
+   * Gets a master set for the list of hashes
+   *
+   * @param hashes to get anagrams for
+   * @return a set of anagrams
+   */
+  public Set<String> getAnagramsByHashes(Set<String> hashes) {
+    return hashes.stream()
+        .map(hash -> anagrams.getOrDefault(hash, new HashSet<>()))
         .flatMap(Set::stream)
         .collect(Collectors.toSet());
   }

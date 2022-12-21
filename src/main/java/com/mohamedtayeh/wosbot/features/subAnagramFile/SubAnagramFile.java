@@ -55,7 +55,8 @@ public class SubAnagramFile {
    * @param letters the letters to compute the subAnagrams of
    */
   private void computeSubAnagrams(String letters) {
-    Set<String> subAnagramsSet = anagramFile.getAnagrams(anagramHelper.allSubsets(letters));
+    Set<String> subAnagramsSet = anagramFile.getAnagramsByHashes(
+        anagramHelper.allSubsetHashes(letters));
     HashMap<Integer, TreeSet<String>> subAnagramsByLen = new HashMap<>();
 
     for (String anagram : subAnagramsSet) {
