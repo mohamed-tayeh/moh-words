@@ -27,7 +27,6 @@ public class SubAnagramController {
 
   private final AnagramController anagramController;
   private final ExecutorService executorService = Executors.newFixedThreadPool(2);
-  private final ExecutorService saveToDb = Executors.newSingleThreadExecutor();
   private SubAnagramRepository subAnagramRepository;
   private AnagramHelper anagramHelper;
 
@@ -75,7 +74,7 @@ public class SubAnagramController {
             consolidateSubAnagramMap(minLength, word.length(), subAnagramsMap, subAnagramsByLen);
           });
 
-      saveToDb.submit(() -> {
+      executorService.submit(() -> {
         subAnagramRepository.saveAll(newSubAnagrams);
       });
 
