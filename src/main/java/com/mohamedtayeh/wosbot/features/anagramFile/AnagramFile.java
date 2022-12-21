@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mohamedtayeh.wosbot.features.anagramHelper.AnagramHelper;
 import com.mohamedtayeh.wosbot.features.constants.FilePaths;
-import jakarta.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -12,14 +11,28 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
 public class AnagramFile {
 
   private final ObjectMapper objectMapper;
   private final AnagramHelper anagramHelper;
   private volatile HashMap<String, Set<String>> anagrams;
+
+  /**
+   * Reads the anagrams file
+   */
+  public AnagramFile(ObjectMapper objectMapper, AnagramHelper anagramHelper) {
+    this.objectMapper = objectMapper;
+    this.anagramHelper = anagramHelper;
+
+    try {
+      anagrams = objectMapper.readValue(new File(FilePaths.ANAGRAM_FILE), new TypeReference<>() {
+      });
+    } catch (IOException e) {
+      System.out.println("Error reading anagrams file: " + e.getMessage());
+      System.exit(1);
+    }
+  }
 
   /**
    * Gets anagrams for the given letters
@@ -55,19 +68,6 @@ public class AnagramFile {
         .map(this::getAnagrams)
         .flatMap(Set::stream)
         .collect(Collectors.toSet());
-  }
-
-  /**
-   * Reads the anagrams file
-   */
-  @PostConstruct
-  private void readFile() {
-    try {
-      anagrams = objectMapper.readValue(new File(FilePaths.ANAGRAM_FILE), new TypeReference<>() {
-      });
-    } catch (IOException ex) {
-      System.out.println("Error reading anagrams file: " + ex.getMessage());
-    }
   }
 
   /**
