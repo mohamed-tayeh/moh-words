@@ -40,14 +40,13 @@ public class SubAnagramFile {
     String hash = anagramHelper.lettersToHash(word);
 
     if (subAnagrams.containsKey(hash)) {
-      return;
+      return; // already calculated or in progress of calculating the angarams of this word
     }
 
     subAnagrams.put(hash, new HashMap<>());
 
     executorService.execute(() -> computeSubAnagrams(word));
   }
-
 
   /**
    * Computes the subAnagrams of a letters and adds them to the subAnagrams file
@@ -66,14 +65,13 @@ public class SubAnagramFile {
         continue;
       }
 
-      TreeSet<String> set = new TreeSet<>();
-      set.add(anagram);
-      subAnagramsByLen.put(length, set);
+      TreeSet<String> treeSet = new TreeSet<>();
+      treeSet.add(anagram);
+      subAnagramsByLen.put(length, treeSet);
     }
 
     subAnagrams.put(anagramHelper.lettersToHash(letters), subAnagramsByLen);
   }
-
 
   /**
    * Write new hashmap to file
