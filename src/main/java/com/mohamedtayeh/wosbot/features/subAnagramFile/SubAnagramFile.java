@@ -16,7 +16,7 @@ public class SubAnagramFile {
   private final ObjectMapper objectMapper;
   private final AnagramHelper anagramHelper;
   private final AnagramFile anagramFile;
-  private volatile HashMap<String, HashMap<Integer, TreeSet<String>>> subAnagrams = new HashMap<>();
+  private HashMap<String, HashMap<Integer, TreeSet<String>>> subAnagrams = new HashMap<>();
 
   /**
    * Adds a word from the words file to the subAnagrams file
