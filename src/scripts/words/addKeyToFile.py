@@ -36,15 +36,14 @@ def anagramFile():
 
                 if count % 10000 == 0:
                     print(f'Completed {count}/{size}')
-
                 count += 1
-
+                
             json.dump(anagramDict, f2)
 
 ## SubAnagrams file
 def subAnagramFile():
-    with open('../../main/resources/prevSubAnagrams.json', 'r') as f:
-        with open('../../main/resources/subAnagramsV2.json', 'w') as f2:
+    with open('../../main/resources/subAnagrams0.json', 'r') as f:
+        with open('../../main/resources/subAnagrams0V2.json', 'w') as f2:
             subAnagrams = json.load(f)
             count = 0
             size = len(subAnagrams)
@@ -54,7 +53,7 @@ def subAnagramFile():
                     '_id': key
                 }
 
-                if count % 10000 == 0:
+                if count % 50000 == 0:
                     print(f'Completed {count}/{size}')
                 count += 1
 
@@ -62,5 +61,5 @@ def subAnagramFile():
 
 if __name__ == '__main__':
     # wordFile()
-    anagramFile()
-    # subAnagramFile()
+    # anagramFile()
+    subAnagramFile()

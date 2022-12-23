@@ -7,13 +7,10 @@ import com.mohamedtayeh.wosbot.features.constants.Constants;
 import com.mohamedtayeh.wosbot.features.constants.FilePaths;
 import java.io.File;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.TreeSet;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
-@Service
 @RequiredArgsConstructor
 public class WordsToAnagram {
 
@@ -38,7 +35,7 @@ public class WordsToAnagram {
       return;
     }
 
-    HashMap<String, Set<String>> anagrams = new HashMap<>();
+    HashMap<String, TreeSet<String>> anagrams = new HashMap<>();
 
     for (String word : words) {
       if (word.length() > Constants.MAX_WORD_LENGTH || word.length() < Constants.MIN_WORD_LENGTH) {
@@ -51,7 +48,7 @@ public class WordsToAnagram {
         continue;
       }
 
-      Set<String> set = new HashSet<>();
+      TreeSet<String> set = new TreeSet<>();
       set.add(word);
       anagrams.put(hash, set);
     }

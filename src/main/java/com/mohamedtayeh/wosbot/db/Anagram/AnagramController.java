@@ -61,6 +61,20 @@ public class AnagramController {
   }
 
   /**
+   * Gets anagrams for the given letters list
+   *
+   * @param hashes hashes to get anagrams for
+   * @return a set of anagrams
+   */
+  public Set<String> getAnagramsByHashes(Set<String> hashes) {
+    return anagramRespository.findAllById(hashes)
+        .stream()
+        .map(Anagram::getValue)
+        .flatMap(Set::stream)
+        .collect(Collectors.toSet());
+  }
+
+  /**
    * Adds a word to the database, either by adding it to an existing anagram or by creating a new
    * one
    *
