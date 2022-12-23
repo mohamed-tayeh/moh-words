@@ -39,11 +39,10 @@ public class CreateSubAnagramFile implements Script {
       subAnagramFile.addWordFromFile(word);
       count++;
 
-      if (count % 100000 == 0) {
-        fileNum++;
-        System.out.println("Saving to file after 100000");
-        subAnagramFile.saveFile(fileNum);
+      if (count % 10000 == 0) {
+        System.out.println("Processed " + count + " words");
       }
     }
+    subAnagramFile.saveFile(fileNum);
   }
 }
