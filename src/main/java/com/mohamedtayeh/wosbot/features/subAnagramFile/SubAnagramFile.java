@@ -7,7 +7,6 @@ import com.mohamedtayeh.wosbot.features.constants.FilePaths;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Set;
 import java.util.TreeSet;
 import lombok.RequiredArgsConstructor;
 
@@ -18,7 +17,7 @@ public class SubAnagramFile {
   private final AnagramHelper anagramHelper;
   private final AnagramFile anagramFile;
   private volatile HashMap<String, HashMap<Integer, TreeSet<String>>> subAnagrams = new HashMap<>();
-  
+
   /**
    * Adds a word from the words file to the subAnagrams file
    *
@@ -31,33 +30,8 @@ public class SubAnagramFile {
       return; // already calculated or in progress of calculating the angarams of this word
     }
 
-    subAnagrams.put(hash, new HashMap<>());
-    computeSubAnagrams(word);
-  }
-
-  /**
-   * Computes the subAnagrams of a letters and adds them to the subAnagrams file
-   *
-   * @param letters the letters to compute the subAnagrams of
-   */
-  private void computeSubAnagrams(String letters) {
-    Set<String> subAnagramsSet = anagramFile.getAnagramsByHashes(
-        anagramHelper.allSubsetHashes(letters));
-    HashMap<Integer, TreeSet<String>> subAnagramsByLen = new HashMap<>();
-
-    for (String anagram : subAnagramsSet) {
-      Integer length = anagram.length();
-      if (subAnagramsByLen.containsKey(length)) {
-        subAnagramsByLen.get(length).add(anagram);
-        continue;
-      }
-
-      TreeSet<String> treeSet = new TreeSet<>();
-      treeSet.add(anagram);
-      subAnagramsByLen.put(length, treeSet);
-    }
-
-    subAnagrams.put(anagramHelper.lettersToHash(letters), subAnagramsByLen);
+    subAnagrams.put(hash,
+        anagramHelper.computeSubAnagrams(word, anagramFile::getAnagramsByHashes));
   }
 
   /**
