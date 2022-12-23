@@ -5,9 +5,12 @@ import com.mohamedtayeh.wosbot.features.constants.Constants;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Stack;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.function.Function;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -20,16 +23,7 @@ public class AnagramHelper {
    * @return hash of the letters
    */
   public String lettersToHash(String letters) {
-    int[] charCount = new int[26];
-    for (int i = 0; i < letters.length(); i++) {
-      int index = letters.charAt(i) - 'a';
-      if (index < 0 || index > 25) {
-        continue;
-      }
-      charCount[index]++;
-    }
-
-    return Arrays.toString(charCount);
+    return Arrays.toString(lettersToCharCount(letters));
   }
 
   /**
@@ -56,40 +50,16 @@ public class AnagramHelper {
   }
 
   /**
-   * Gets all possible hashes given the wild cards
-   *
-   * @param letters to find the possibilities from
-   * @return a list of all possible hashes
-   */
-  private List<String> getLettersFromWildCardHelper(String letters) {
-
-    List<String> hashes = new ArrayList<>();
-    for (int i = 0; i < letters.length(); i++) {
-      if (letters.charAt(i) == Constants.WILD_CARD) {
-        for (int j = 0; j < 26; j++) {
-          String newLetters = letters.substring(0, i) + (char) (j + 'a') + letters.substring(i + 1);
-          hashes.addAll(getLettersFromWildCardHelper(newLetters));
-        }
-        return hashes;
-      }
-    }
-
-    hashes.add(letters);
-    return hashes;
-  }
-
-
-  /**
    * Get all possible subsets of letters
    *
    * @param letters to get the subsets from
-   * @return list of subsets
+   * @return Set of subsets
    */
-  public List<String> allSubsets(String letters) {
-    List<String> subsets = new ArrayList<>();
-    Stack<String> currSubset = new Stack<>();
-    subsetDfs(letters, subsets, currSubset, 0);
-    return subsets;
+  public Set<String> allSubsetHashes(String letters) {
+    int[] charCount = lettersToCharCount(letters);
+    Set<String> subsetHashes = new HashSet<>();
+    subsetHashDFS(subsetHashes, charCount, 0, letters.length());
+    return subsetHashes;
   }
 
   /**
@@ -120,29 +90,100 @@ public class AnagramHelper {
     return true;
   }
 
+
   /**
-   * Helper function for allSubsets method
+   * Computes the subAnagrams of a letters and adds them to the subAnagrams file
    *
-   * @param letters to get the subsets from
-   * @param res     the list to add the subsets to
-   * @param curr    the current subset
-   * @param index   the current index being traversed
+   * @param letters             the letters to compute the subAnagrams of
+   * @param getAnagramsByHashes to get the anagrams by the hashes
+   * @return computed map of subAnagrams
    */
-  private void subsetDfs(String letters, List<String> res, Stack<String> curr, Integer index) {
-    if (index == letters.length() && curr.size() < 4) {
-      return;
+  public HashMap<Integer, TreeSet<String>> computeSubAnagrams(String letters,
+      Function<Set<String>, Set<String>> getAnagramsByHashes) {
+    Set<String> subAnagramsSet = getAnagramsByHashes.apply(allSubsetHashes(letters));
+    HashMap<Integer, TreeSet<String>> subAnagramsByLen = new HashMap<>();
+
+    for (String anagram : subAnagramsSet) {
+      Integer length = anagram.length();
+      if (subAnagramsByLen.containsKey(length)) {
+        subAnagramsByLen.get(length).add(anagram);
+        continue;
+      }
+
+      TreeSet<String> treeSet = new TreeSet<>();
+      treeSet.add(anagram);
+      subAnagramsByLen.put(length, treeSet);
     }
 
-    if (index == letters.length()) {
-      res.add(String.join("", curr));
-      return;
-    }
-
-    curr.add(String.valueOf(letters.charAt(index)));
-    subsetDfs(letters, res, curr, index + 1);
-
-    curr.pop();
-    subsetDfs(letters, res, curr, index + 1);
+    return subAnagramsByLen;
   }
 
+  /**
+   * Converts a letters to a charCount array
+   *
+   * @param letters to count the letters of
+   * @return charCount of the letters
+   */
+  private int[] lettersToCharCount(String letters) {
+    int[] charCount = new int[26];
+    for (int i = 0; i < letters.length(); i++) {
+      int index = letters.charAt(i) - 'a';
+      if (index < 0 || index > 25) {
+        continue;
+      }
+      charCount[index]++;
+    }
+
+    return charCount;
+  }
+
+  /**
+   * Gets all possible hashes given the wild cards
+   *
+   * @param letters to find the possibilities from
+   * @return a list of all possible hashes
+   */
+  private List<String> getLettersFromWildCardHelper(String letters) {
+
+    List<String> hashes = new ArrayList<>();
+    for (int i = 0; i < letters.length(); i++) {
+      if (letters.charAt(i) == Constants.WILD_CARD) {
+        for (int j = 0; j < 26; j++) {
+          String newLetters = letters.substring(0, i) + (char) (j + 'a') + letters.substring(i + 1);
+          hashes.addAll(getLettersFromWildCardHelper(newLetters));
+        }
+        return hashes;
+      }
+    }
+
+    hashes.add(letters);
+    return hashes;
+  }
+
+  private void subsetHashDFS(Set<String> subsetHashes, int[] charCount, int currI,
+      int currCharLength) {
+
+    if (currCharLength <= Constants.MIN_WORD_LENGTH - 1) {
+      return;
+    }
+
+    if (currI >= 26) { // must be >= MIN_WORD_LENGTH b/c of first if statement
+      subsetHashes.add(Arrays.toString(charCount));
+      return;
+    }
+
+    subsetHashDFS(subsetHashes, charCount, currI + 1, currCharLength);
+
+    if (charCount[currI] > 0) {
+      charCount[currI]--;
+
+      if (charCount[currI] > 0) {
+        subsetHashDFS(subsetHashes, charCount, currI, currCharLength - 1);
+      } else {
+        subsetHashDFS(subsetHashes, charCount, currI + 1, currCharLength - 1);
+      }
+
+      charCount[currI]++;
+    }
+  }
 }

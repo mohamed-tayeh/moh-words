@@ -7,11 +7,6 @@ import com.mohamedtayeh.wosbot.features.constants.FilePaths;
 import com.mohamedtayeh.wosbot.features.subAnagramFile.SubAnagramFile;
 import java.io.File;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -33,29 +28,21 @@ public class CreateSubAnagramFile implements Script {
       return;
     }
 
+    int count = 0;
+    int fileNum = 0;
     for (String word : words) {
+
       if (word.length() < Constants.MIN_WORD_LENGTH || word.length() > Constants.MAX_WORD_LENGTH) {
         continue;
       }
 
       subAnagramFile.addWordFromFile(word);
-    }
+      count++;
 
-    ExecutorService executorService = subAnagramFile.getExecutorService();
-    executorService.shutdown();
-    ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(1);
-
-    scheduledExecutor.scheduleAtFixedRate(() -> {
-      System.out.println(
-          "Get Completed Tasks: " + ((ThreadPoolExecutor) executorService).getCompletedTaskCount());
-
-      if (executorService.isTerminated()) {
-        System.out.println("Done creating subAnagram file...");
-        subAnagramFile.saveFile();
-        scheduledExecutor.shutdown();
-        executorService.shutdown();
+      if (count % 10000 == 0) {
+        System.out.println("Processed " + count + " words");
       }
-    }, 0, 10, TimeUnit.SECONDS);
-
+    }
+    subAnagramFile.saveFile(fileNum);
   }
 }
