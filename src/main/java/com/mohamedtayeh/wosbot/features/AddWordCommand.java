@@ -9,12 +9,10 @@ import com.mohamedtayeh.wosbot.features.dictionaryApi.DictionaryApi;
 import com.mohamedtayeh.wosbot.features.messageHelper.MessageHelper;
 import java.util.HashSet;
 import java.util.List;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
-@NonNull
 @RequiredArgsConstructor
 public class AddWordCommand extends Command {
 
@@ -22,6 +20,7 @@ public class AddWordCommand extends Command {
   private final MessageHelper messageHelper;
   private final DictionaryApi dictionaryApi;
   private final SubAnagramController subAnagramController;
+
 
   /**
    * Used to add a listener to the event handler
@@ -60,8 +59,8 @@ public class AddWordCommand extends Command {
         .isWord(word)
         .thenAccept(isWord -> {
           if (isWord) {
-            subAnagramController.addWord(word);
             this.say(event, String.format(Responses.WORD_ADDED, event.getUser().getName()));
+            subAnagramController.addWord(word);
             return;
           }
 

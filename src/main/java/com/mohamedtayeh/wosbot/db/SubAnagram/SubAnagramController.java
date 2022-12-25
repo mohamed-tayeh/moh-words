@@ -5,6 +5,7 @@ import com.mohamedtayeh.wosbot.db.SubAnagram.Exceptions.InvalidSubAnagram;
 import com.mohamedtayeh.wosbot.features.anagramHelper.AnagramHelper;
 import com.mohamedtayeh.wosbot.features.constants.Constants;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,20 +15,32 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
-import lombok.AllArgsConstructor;
-import lombok.NonNull;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 @Service
-@AllArgsConstructor
-@NonNull
+@Scope("singleton")
 public class SubAnagramController {
 
-  private final AnagramController anagramController;
   private final ExecutorService executorService = Executors.newSingleThreadExecutor();
-  private SubAnagramRepository subAnagramRepository;
-  private AnagramHelper anagramHelper;
+  private final AnagramController anagramController;
+  private final SubAnagramRepository subAnagramRepository;
+  private final AnagramHelper anagramHelper;
+  private Set<int[]> primaryKeys;
+
+  public SubAnagramController(AnagramController anagramController,
+      SubAnagramRepository subAnagramRepository, AnagramHelper anagramHelper) {
+    this.anagramController = anagramController;
+    this.subAnagramRepository = subAnagramRepository;
+    this.anagramHelper = anagramHelper;
+
+    this.primaryKeys = subAnagramRepository.findAll()
+        .stream()
+        .map(SubAnagram::getId)
+        .map(anagramHelper::hashToCharCount)
+        .collect(Collectors.toSet());
+  }
 
   /**
    * Checks if a word is already contained in the subAnagram repository
@@ -94,6 +107,25 @@ public class SubAnagramController {
 
     anagramController.addWord(hash, word);
 
+    executorService.submit(() -> {
+      int[] charCount = anagramHelper.lettersToCharCount(word);
+
+      List<String> keysToUpdate = new ArrayList<>();
+
+      for (int[] primaryKey : primaryKeys) {
+        if (anagramHelper.isSubAnagramOfCharCount(primaryKey, charCount)) {
+          keysToUpdate.add(Arrays.toString(primaryKey));
+        }
+      }
+
+      subAnagramRepository.saveAll(
+          subAnagramRepository.findAllById(keysToUpdate)
+              .stream()
+              .peek(superSet -> superSet.addSubAnagram(word)).toList());
+
+      primaryKeys.add(charCount);
+    });
+
     if (!subAnagram.getValue().isEmpty()) { // there has been a query with this word
       subAnagram.addSubAnagram(word);
       subAnagramRepository.save(subAnagram);
@@ -105,6 +137,7 @@ public class SubAnagramController {
       computeSubAnagrams(subAnagram, word);
       subAnagramRepository.save(subAnagram);
     });
+
   }
 
   /**
@@ -159,6 +192,7 @@ public class SubAnagramController {
             Map<Integer, TreeSet<String>> subAnagramsByLen = anagramHelper.computeSubAnagrams(
                 hashToWord.get(hash), anagramController::getAnagramsByHashes);
             newSubAnagrams.add(new SubAnagram(hash, subAnagramsByLen));
+            primaryKeys.add(anagramHelper.hashToCharCount(hash));
             consolidateSubAnagramMap(minLength, letters.length(), subAnagramsMap, subAnagramsByLen);
           });
 
