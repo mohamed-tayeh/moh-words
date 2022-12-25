@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 @Service
 @NonNull
 @RequiredArgsConstructor
+@Deprecated
 public class AddAnagramCommand extends Command {
 
   private static final HashSet<String> cmdSet = new HashSet<>(List.of("!addanagram", "!adda"));
