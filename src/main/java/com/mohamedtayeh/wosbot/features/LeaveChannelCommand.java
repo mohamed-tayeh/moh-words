@@ -46,11 +46,20 @@ public class LeaveChannelCommand extends Command {
     if (!event.getMessage().startsWith(Constants.COMMAND_PREFIX)) {
       return;
     }
+    
     String cmd = messageHelper.parseMesssage(event)[0];
     if (cmdSet.contains(cmd) && event.getChannel().getName()
         .equalsIgnoreCase(Constants.HOST_CHANNEL)) {
+
+      String channelId = event.getUser().getId();
       String channelName = event.getUser().getName();
-      channelController.removeChannel(event.getUser().getId());
+
+      if (!channelController.isJoined(channelId)) {
+        this.say(event, Responses.ALREADY_LEFT_CHANNEL);
+        return;
+      }
+
+      channelController.removeChannel(channelId);
       bot.leaveChannel(channelName);
       this.say(event, String.format(Responses.LEAVE_CHANNEL, channelName));
     }
