@@ -7,6 +7,7 @@ import com.mohamedtayeh.wosbot.features.constants.Constants;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -17,6 +18,8 @@ import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -34,12 +37,24 @@ public class SubAnagramController {
     this.anagramController = anagramController;
     this.subAnagramRepository = subAnagramRepository;
     this.anagramHelper = anagramHelper;
+    getPrimaryKeys();
+  }
 
-    this.primaryKeys = subAnagramRepository.findAll()
-        .stream()
-        .map(SubAnagram::getId)
-        .map(anagramHelper::hashToCharCount)
-        .collect(Collectors.toSet());
+  private void getPrimaryKeys() {
+    primaryKeys = new HashSet<>();
+
+    int pageSize = 10000;
+    int pageNum = 0;
+    boolean gotAllKeys = false;
+
+    while (!gotAllKeys) {
+      Page<SubAnagram> page = subAnagramRepository.findAll(PageRequest.of(pageNum, pageSize));
+      page.forEach(
+          subAnagram -> primaryKeys.add(anagramHelper.hashToCharCount(subAnagram.getId())));
+
+      gotAllKeys = !page.hasNext();
+      pageNum++;
+    }
   }
 
   /**
