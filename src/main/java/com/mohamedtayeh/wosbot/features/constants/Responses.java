@@ -39,6 +39,8 @@ public class Responses {
   public static final String JOINED_CHANNEL = "I have successfully joined your channel! Make "
       + "sure to mod me to ensure that I can work in followers-only mode and so that I can "
       + "send many messages at once, otherwise Twitch will make me slow ;p\n";
+  public static final String ALREADY_JOINED_CHANNEL = "I am already in your channel ;)";
   public static final String LEAVE_CHANNEL =
       "I have left your channel @%s, you can always add me again using !join";
+  public static final String ALREADY_LEFT_CHANNEL = "I already left your channel (:";
 }
