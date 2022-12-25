@@ -35,4 +35,10 @@ public class Responses {
   public static final String ANAGRAM_ADDED = "Anagram added to the word, thank you @%s!";
   public static final String ANAGRAM_NOT_VALID = "This anagram is not valid for this word @%s!";
   public static final String SUB_ANAGRAM_TOO_LONG = "The anagram is too long @%s!";
+
+  public static final String JOINED_CHANNEL = "I have successfully joined your channel! Make "
+      + "sure to mod me to ensure that I can work in followers-only mode and so that I can "
+      + "send many messages at once, otherwise Twitch will make me slow ;p\n";
+  public static final String LEAVE_CHANNEL =
+      "I have left your channel @%s, you can always add me again using !join";
 }
