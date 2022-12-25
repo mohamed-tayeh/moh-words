@@ -23,4 +23,8 @@ public class ChannelController {
   public void removeChannel(String id) {
     channelRepository.deleteById(id);
   }
+
+  public Boolean isJoined(String id) {
+    return channelRepository.findById(id).isPresent();
+  }
 }

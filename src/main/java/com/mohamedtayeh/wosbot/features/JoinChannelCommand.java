@@ -47,8 +47,15 @@ public class JoinChannelCommand extends Command {
     String cmd = messageHelper.parseMesssage(event)[0];
     if (cmdSet.contains(cmd) && event.getChannel().getName()
         .equalsIgnoreCase(Constants.HOST_CHANNEL)) {
+      String channelId = event.getUser().getId();
       String channelName = event.getUser().getName();
-      channelController.addChannel(event.getUser().getId(), channelName);
+
+      if (channelController.isJoined(channelId)) {
+        this.say(event, Responses.ALREADY_JOINED_CHANNEL);
+        return;
+      }
+
+      channelController.addChannel(channelId, channelName);
       bot.joinChannel(channelName);
       this.say(event, Responses.JOINED_CHANNEL);
     }

@@ -27,40 +27,22 @@ public class AnagramHelper {
   }
 
   /**
-   * Wrapper to get all possible hashes given the wild cards
+   * Converts a letters to a hash
    *
-   * @param letters to get the hashes of (can have a wild card)
-   * @return list of all possible hashes
-   * @throws TooManyWildCards if there are more than expected wild cards
+   * @param hash to convert
+   * @return char count of the hash
    */
-  public List<String> getLettersFromWildCard(String letters) throws TooManyWildCards {
+  public int[] hashToCharCount(String hash) {
 
-    int wildCardCount = 0;
-    for (int i = 0; i < letters.length(); i++) {
-      if (letters.charAt(i) == Constants.WILD_CARD) {
-        wildCardCount++;
-      }
+    String[] hashArr = hash.substring(1, hash.length() - 1).split(", ");
+    int[] charCount = new int[26];
+    for (int i = 0; i < 26; i++) {
+      charCount[i] = Integer.parseInt(hashArr[i]);
     }
 
-    if (wildCardCount > Constants.MAX_WILD_CARDS) {
-      throw new TooManyWildCards("Too many wild cards");
-    }
-
-    return getLettersFromWildCardHelper(letters);
+    return charCount;
   }
 
-  /**
-   * Get all possible subsets of letters
-   *
-   * @param letters to get the subsets from
-   * @return Set of subsets
-   */
-  public Set<String> allSubsetHashes(String letters) {
-    int[] charCount = lettersToCharCount(letters);
-    Set<String> subsetHashes = new HashSet<>();
-    subsetHashDFS(subsetHashes, charCount, 0, letters.length());
-    return subsetHashes;
-  }
 
   /**
    * Returns true if subAnagram can be made from word
@@ -90,7 +72,6 @@ public class AnagramHelper {
     return true;
   }
 
-
   /**
    * Computes the subAnagrams of a letters and adds them to the subAnagrams file
    *
@@ -119,12 +100,29 @@ public class AnagramHelper {
   }
 
   /**
+   * Returns true if charCount is a subAnagram of primaryKey
+   *
+   * @param primaryKey the primary key to check if charCount is a subAnagram of
+   * @param charCount  the charCount to check if it is a subAnagram of primaryKey
+   * @return true if charCount is a subAnagram of primaryKey, false otherwise
+   */
+  public Boolean isSubAnagramOfCharCount(int[] primaryKey, int[] charCount) {
+    for (int i = 0; i < 26; i++) {
+      if (primaryKey[i] < charCount[i]) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  /**
    * Converts a letters to a charCount array
    *
    * @param letters to count the letters of
    * @return charCount of the letters
    */
-  private int[] lettersToCharCount(String letters) {
+  public int[] lettersToCharCount(String letters) {
     int[] charCount = new int[26];
     for (int i = 0; i < letters.length(); i++) {
       int index = letters.charAt(i) - 'a';
@@ -135,6 +133,29 @@ public class AnagramHelper {
     }
 
     return charCount;
+  }
+
+  /**
+   * Wrapper to get all possible hashes given the wild cards
+   *
+   * @param letters to get the hashes of (can have a wild card)
+   * @return list of all possible hashes
+   * @throws TooManyWildCards if there are more than expected wild cards
+   */
+  public List<String> getLettersFromWildCard(String letters) throws TooManyWildCards {
+
+    int wildCardCount = 0;
+    for (int i = 0; i < letters.length(); i++) {
+      if (letters.charAt(i) == Constants.WILD_CARD) {
+        wildCardCount++;
+      }
+    }
+
+    if (wildCardCount > Constants.MAX_WILD_CARDS) {
+      throw new TooManyWildCards("Too many wild cards");
+    }
+
+    return getLettersFromWildCardHelper(letters);
   }
 
   /**
@@ -158,6 +179,19 @@ public class AnagramHelper {
 
     hashes.add(letters);
     return hashes;
+  }
+
+  /**
+   * Get all possible subsets of letters
+   *
+   * @param letters to get the subsets from
+   * @return Set of subsets
+   */
+  public Set<String> allSubsetHashes(String letters) {
+    int[] charCount = lettersToCharCount(letters);
+    Set<String> subsetHashes = new HashSet<>();
+    subsetHashDFS(subsetHashes, charCount, 0, letters.length());
+    return subsetHashes;
   }
 
   private void subsetHashDFS(Set<String> subsetHashes, int[] charCount, int currI,

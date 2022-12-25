@@ -7,7 +7,6 @@ import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import com.github.twitch4j.ITwitchClient;
 import com.github.twitch4j.TwitchClientBuilder;
 import com.mohamedtayeh.wosbot.db.Channel.ChannelController;
-import com.mohamedtayeh.wosbot.features.AddAnagramCommand;
 import com.mohamedtayeh.wosbot.features.AddWordCommand;
 import com.mohamedtayeh.wosbot.features.DefineCommand;
 import com.mohamedtayeh.wosbot.features.GetAnagramsCommand;
@@ -33,7 +32,6 @@ public class Bot {
   private final GetWordsCommand getWordsCommand;
   private final DefineCommand defineCommand;
   private final GetAnagramsCommand getAnagramsCommand;
-  private final AddAnagramCommand addAnagramCommand;
   private final AddWordCommand addWordCommand;
   private final JoinChannelCommand joinChannelCommand;
   private final LeaveChannelCommand leaveChannelCommand;
@@ -45,8 +43,7 @@ public class Bot {
 
   public Bot(ChannelController channelController, DefineCommand defineCommand,
       GetAnagramsCommand getAnagramsCommand,
-      GetWordsCommand getWordsCommand,
-      AddAnagramCommand addAnagramCommand, AddWordCommand addWordCommand,
+      GetWordsCommand getWordsCommand, AddWordCommand addWordCommand,
       JoinChannelCommand joinChannelCommand, LeaveChannelCommand leaveChannelCommand) {
     // Load Configuration
     loadConfiguration();
@@ -71,7 +68,6 @@ public class Bot {
     this.defineCommand = defineCommand;
     this.getAnagramsCommand = getAnagramsCommand;
     this.getWordsCommand = getWordsCommand;
-    this.addAnagramCommand = addAnagramCommand;
     this.addWordCommand = addWordCommand;
     this.joinChannelCommand = joinChannelCommand;
     this.joinChannelCommand.setBot(this);
@@ -90,7 +86,6 @@ public class Bot {
     defineCommand.handleEvent(eventHandler);
     getAnagramsCommand.handleEvent(eventHandler);
     getWordsCommand.handleEvent(eventHandler);
-    addAnagramCommand.handleEvent(eventHandler);
     addWordCommand.handleEvent(eventHandler);
     joinChannelCommand.handleEvent(eventHandler);
     leaveChannelCommand.handleEvent(eventHandler);
