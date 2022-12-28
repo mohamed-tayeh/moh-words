@@ -2,14 +2,15 @@ package com.mohamedtayeh.wosbot.features;
 
 import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
-import com.mohamedtayeh.wosbot.db.SubAnagram.SubAnagramController;
+import com.github.twitch4j.common.enums.CommandPermission;
+import com.mohamedtayeh.wosbot.db.subAnagram.SubAnagramController;
 import com.mohamedtayeh.wosbot.features.constants.Constants;
 import com.mohamedtayeh.wosbot.features.constants.Responses;
 import com.mohamedtayeh.wosbot.features.messageHelper.MessageHelper;
 import com.mohamedtayeh.wosbot.features.wordApi.WordApi;
 import jakarta.annotation.PostConstruct;
-import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import lombok.NonNull;
@@ -21,8 +22,8 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class GetWordsCommand extends Command {
 
-  private final Set<String> cmdApiSet = new HashSet<>(Arrays.asList("!wordapi", "!wordsapi"));
-  private final Set<String> cmdDictSet = new HashSet<>(Arrays.asList("!word", "!words"));
+  private final Set<String> cmdApiSet = new HashSet<>(List.of("!wordapi", "!wordsapi"));
+  private final Set<String> cmdDictSet = new HashSet<>(List.of("!word", "!words"));
   private final Set<String> cmdSet = new HashSet<>();
 
   private final MessageHelper messageHelper;
@@ -98,6 +99,14 @@ public class GetWordsCommand extends Command {
    * @throws Exception if the user input is invalid
    */
   private Object[] sanitizeInput(ChannelMessageEvent event, String[] msgSplit) throws Exception {
+
+    Set<CommandPermission> perms = event.getPermissions();
+    if (!(perms.contains(CommandPermission.MODERATOR) || perms.contains(CommandPermission.VIP)
+        || perms.contains(CommandPermission.BROADCASTER))) {
+      this.say(event, Responses.ONLY_MODS_AND_VIPS);
+      throw new Exception("Not VIP, Mod or broadcaster");
+    }
+
     String word = msgSplit[1];
 
     if (word.length() > Constants.MAX_WORD_LENGTH) {

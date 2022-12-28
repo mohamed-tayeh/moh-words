@@ -26,15 +26,10 @@ public class Responses {
 
   public static final String WORD_ADDED = "Word has been added to our dictionary, thank you @%s!";
   public static final String WORD_EXISTS = "Word is already in the dictionary @%s ;)";
-  public static final String WORD_NOT_FOUND = "I couldn't find the word \"%s\" in the dictionary @%s please add it using !addw word-here";
   public static final String NOT_A_WORD = "Looks like \"%s\" is not a valid word in the dictionary @%s 🤔";
 
-  public static final String ADD_ANAGRAM_HELP = "@%s Add an anagram to the word. Usage: !adda word-here anagram-here";
-  public static final String NOT_ANAGRAM_IS_WORD = "It seems that we don't have this anagram as a word, so please use !addw word-here instead!";
-  public static final String ANAGRAM_ALREADY_EXISTS = "This anagram already exists for this word @%s!";
-  public static final String ANAGRAM_ADDED = "Anagram added to the word, thank you @%s!";
-  public static final String ANAGRAM_NOT_VALID = "This anagram is not valid for this word @%s!";
-  public static final String SUB_ANAGRAM_TOO_LONG = "The anagram is too long @%s!";
+  public static final String ONLY_MODS_AND_VIPS = "The bot is configured to only be used by "
+      + "broadcaster, mods and vips (:";
 
   public static final String JOINED_CHANNEL = "I have successfully joined your channel! Make "
       + "sure to mod me to ensure that I can work in followers-only mode and so that I can "
