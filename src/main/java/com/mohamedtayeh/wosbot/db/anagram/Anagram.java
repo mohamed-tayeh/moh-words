@@ -1,4 +1,4 @@
-package com.mohamedtayeh.wosbot.db.Anagram;
+package com.mohamedtayeh.wosbot.db.anagram;
 
 import java.util.TreeSet;
 import lombok.AllArgsConstructor;
