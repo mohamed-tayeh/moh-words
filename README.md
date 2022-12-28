@@ -17,5 +17,5 @@ playing [Words on Stream](https://wos.gg/).
   Aliases: `!wordsapi`.
 - `!define word`: Find the definition of `word` using
   the [Free dictionary API](https://dictionaryapi.dev/).
-- `!anagram word`: Find anagrams of `word` using the the custom database I made.
+- `!anagram word`: Find anagrams of `word` using the custom database I made.
   Aliases: `!anagrams`.
