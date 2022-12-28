@@ -2,7 +2,8 @@ package com.mohamedtayeh.wosbot.features;
 
 import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
-import com.mohamedtayeh.wosbot.db.SubAnagram.SubAnagramController;
+import com.mohamedtayeh.wosbot.db.newWord.NewWordController;
+import com.mohamedtayeh.wosbot.db.subAnagram.SubAnagramController;
 import com.mohamedtayeh.wosbot.features.constants.Constants;
 import com.mohamedtayeh.wosbot.features.constants.Responses;
 import com.mohamedtayeh.wosbot.features.dictionaryApi.DictionaryApi;
@@ -20,7 +21,7 @@ public class AddWordCommand extends Command {
   private final MessageHelper messageHelper;
   private final DictionaryApi dictionaryApi;
   private final SubAnagramController subAnagramController;
-
+  private final NewWordController newWordController;
 
   /**
    * Used to add a listener to the event handler
@@ -61,6 +62,7 @@ public class AddWordCommand extends Command {
           if (isWord) {
             this.say(event, String.format(Responses.WORD_ADDED, event.getUser().getName()));
             subAnagramController.addWord(word);
+            newWordController.addWord(word);
             return;
           }
 
