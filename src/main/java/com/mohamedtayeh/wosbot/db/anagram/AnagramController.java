@@ -1,4 +1,4 @@
-package com.mohamedtayeh.wosbot.db.Anagram;
+package com.mohamedtayeh.wosbot.db.anagram;
 
 import com.mohamedtayeh.wosbot.features.anagramHelper.AnagramHelper;
 import java.util.List;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 @NonNull
 public class AnagramController {
 
-  private AnagramRespository anagramRespository;
+  private AnagramRepository anagramRepository;
   private AnagramHelper anagramHelper;
 
   /**
@@ -35,7 +35,7 @@ public class AnagramController {
    */
   public TreeSet<String> getAnagrams(String letters) {
 
-    return anagramRespository
+    return anagramRepository
         .findById(anagramHelper.lettersToHash(letters))
         .orElseGet(() -> new Anagram("", new TreeSet<>()))
         .getValue();
@@ -48,7 +48,7 @@ public class AnagramController {
    * @return a set of anagrams
    */
   public Set<String> getAnagrams(List<String> lettersList) {
-    return anagramRespository.findAllById(
+    return anagramRepository.findAllById(
             lettersList.stream()
                 .map(anagramHelper::lettersToHash)
                 .collect(Collectors.toList())
@@ -67,7 +67,7 @@ public class AnagramController {
    * @return a set of anagrams
    */
   public Set<String> getAnagramsByHashes(Set<String> hashes) {
-    return anagramRespository.findAllById(hashes)
+    return anagramRepository.findAllById(hashes)
         .stream()
         .map(Anagram::getValue)
         .flatMap(Set::stream)
@@ -82,12 +82,12 @@ public class AnagramController {
    * @param word to add
    */
   public void addWord(String hash, String word) {
-    Anagram anagram = anagramRespository
+    Anagram anagram = anagramRepository
         .findById(hash)
         .orElseGet(() -> new Anagram(hash, new TreeSet<>()));
 
     anagram.addValue(word);
-    anagramRespository.save(anagram);
+    anagramRepository.save(anagram);
   }
 
   /**
@@ -97,7 +97,7 @@ public class AnagramController {
    * @return true if word is in the file, false otherwise
    */
   public Boolean containsWord(String word) {
-    return anagramRespository
+    return anagramRepository
         .findById(anagramHelper.lettersToHash(word))
         .orElseGet(() -> new Anagram("", new TreeSet<>()))
         .containsWord(word);

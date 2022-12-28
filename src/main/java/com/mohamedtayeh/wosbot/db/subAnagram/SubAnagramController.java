@@ -1,7 +1,7 @@
-package com.mohamedtayeh.wosbot.db.SubAnagram;
+package com.mohamedtayeh.wosbot.db.subAnagram;
 
-import com.mohamedtayeh.wosbot.db.Anagram.AnagramController;
-import com.mohamedtayeh.wosbot.db.SubAnagram.Exceptions.InvalidSubAnagram;
+import com.mohamedtayeh.wosbot.db.anagram.AnagramController;
+import com.mohamedtayeh.wosbot.db.subAnagram.exceptions.InvalidSubAnagram;
 import com.mohamedtayeh.wosbot.features.anagramHelper.AnagramHelper;
 import com.mohamedtayeh.wosbot.features.constants.Constants;
 import java.util.ArrayList;
@@ -43,7 +43,7 @@ public class SubAnagramController {
   private void getPrimaryKeys() {
     primaryKeys = new HashSet<>();
 
-    int pageSize = 10000;
+    int pageSize = 5000;
     int pageNum = 0;
     boolean gotAllKeys = false;
 

@@ -1,6 +1,6 @@
 package com.mohamedtayeh.wosbot.features.anagramHelper;
 
-import com.mohamedtayeh.wosbot.features.anagramHelper.Exceptions.TooManyWildCards;
+import com.mohamedtayeh.wosbot.features.anagramHelper.exceptions.TooManyWildCards;
 import com.mohamedtayeh.wosbot.features.constants.Constants;
 import java.util.ArrayList;
 import java.util.Arrays;

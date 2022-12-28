@@ -3,7 +3,7 @@ package com.mohamedtayeh.wosbot.features;
 import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
 import com.mohamedtayeh.wosbot.Bot;
-import com.mohamedtayeh.wosbot.db.Channel.ChannelController;
+import com.mohamedtayeh.wosbot.db.channel.ChannelController;
 import com.mohamedtayeh.wosbot.features.constants.Constants;
 import com.mohamedtayeh.wosbot.features.constants.Responses;
 import com.mohamedtayeh.wosbot.features.messageHelper.MessageHelper;
@@ -46,7 +46,7 @@ public class LeaveChannelCommand extends Command {
     if (!event.getMessage().startsWith(Constants.COMMAND_PREFIX)) {
       return;
     }
-    
+
     String cmd = messageHelper.parseMesssage(event)[0];
     if (cmdSet.contains(cmd) && event.getChannel().getName()
         .equalsIgnoreCase(Constants.HOST_CHANNEL)) {

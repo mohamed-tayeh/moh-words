@@ -6,7 +6,7 @@ import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import com.github.twitch4j.ITwitchClient;
 import com.github.twitch4j.TwitchClientBuilder;
-import com.mohamedtayeh.wosbot.db.Channel.ChannelController;
+import com.mohamedtayeh.wosbot.db.channel.ChannelController;
 import com.mohamedtayeh.wosbot.features.AddWordCommand;
 import com.mohamedtayeh.wosbot.features.DefineCommand;
 import com.mohamedtayeh.wosbot.features.GetAnagramsCommand;
@@ -60,9 +60,9 @@ public class Bot {
         .withEnableHelix(true)
         .withChatAccount(credential)
         .withEnableChat(true)
+        .build();
 //        .withChatChannelMessageLimit(
 //            Bandwidth.simple(1, Duration.ofSeconds(2)).withId("per-channel-limit"))
-        .build();
 
     this.channelController = channelController;
     this.defineCommand = defineCommand;
@@ -101,7 +101,7 @@ public class Bot {
       configuration = mapper.readValue(new File(FilePaths.CONFIG_FILE_NAME), Configuration.class);
       // Channels
       List<String> channels = mapper.readValue(new File(FilePaths.CHANNELS_FILE_NAME),
-          new TypeReference<List<String>>() {
+          new TypeReference<>() {
           });
       configuration.setChannels(channels);
 

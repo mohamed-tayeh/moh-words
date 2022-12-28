@@ -1,4 +1,4 @@
-package com.mohamedtayeh.wosbot.db.SubAnagram;
+package com.mohamedtayeh.wosbot.db.subAnagram;
 
 import java.util.Collections;
 import java.util.Map;

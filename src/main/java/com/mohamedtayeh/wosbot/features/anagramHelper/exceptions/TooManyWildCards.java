@@ -1,4 +1,4 @@
-package com.mohamedtayeh.wosbot.features.anagramHelper.Exceptions;
+package com.mohamedtayeh.wosbot.features.anagramHelper.exceptions;
 
 public class TooManyWildCards extends IllegalArgumentException {
 

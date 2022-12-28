@@ -3,7 +3,7 @@ package com.mohamedtayeh.wosbot.features;
 import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
 import com.mohamedtayeh.wosbot.Bot;
-import com.mohamedtayeh.wosbot.db.Channel.ChannelController;
+import com.mohamedtayeh.wosbot.db.channel.ChannelController;
 import com.mohamedtayeh.wosbot.features.constants.Constants;
 import com.mohamedtayeh.wosbot.features.constants.Responses;
 import com.mohamedtayeh.wosbot.features.messageHelper.MessageHelper;

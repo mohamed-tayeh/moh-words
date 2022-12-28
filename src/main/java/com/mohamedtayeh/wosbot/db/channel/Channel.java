@@ -1,4 +1,4 @@
-package com.mohamedtayeh.wosbot.db.Channel;
+package com.mohamedtayeh.wosbot.db.channel;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

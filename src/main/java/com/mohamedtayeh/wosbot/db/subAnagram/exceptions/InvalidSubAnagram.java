@@ -1,4 +1,4 @@
-package com.mohamedtayeh.wosbot.db.SubAnagram.Exceptions;
+package com.mohamedtayeh.wosbot.db.subAnagram.exceptions;
 
 public class InvalidSubAnagram extends Exception {
 
