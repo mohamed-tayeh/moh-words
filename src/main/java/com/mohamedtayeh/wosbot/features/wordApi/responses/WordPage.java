@@ -19,7 +19,7 @@ public class WordPage {
   /**
    * Sorts the response word list
    *
-   * @note this is used internally by Jaskson to sort the response
+   * @apiNote this is used internally by Jackson to sort the response
    */
   public void setWordList(PossibleWord[] wordList) {
     this.wordList = wordList;
