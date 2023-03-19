@@ -14,5 +14,5 @@ public class Constants {
   public static final Integer MAX_DEFINITIONS = 3;
   public static final Integer MAX_WILD_CARDS = 3;
   public static final Character WILD_CARD = '?';
-  public static final String HOST_CHANNEL = "moh_manager";
+  public static final String HOST_CHANNEL = "mohword";
 }
