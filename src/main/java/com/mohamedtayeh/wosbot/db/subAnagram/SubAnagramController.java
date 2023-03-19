@@ -58,48 +58,6 @@ public class SubAnagramController {
   }
 
   /**
-   * Checks if a word is already contained in the subAnagram repository
-   *
-   * @param word       to check
-   * @param subAnagram to check
-   * @return true if the word is contained in the subAnagram, false otherwise
-   */
-  public Boolean containsSubAnagram(String word, String subAnagram) {
-    String hash = anagramHelper.lettersToHash(word);
-
-    if (subAnagramRepository.existsById(hash)) {
-      return subAnagramRepository
-          .findById(hash)
-          .orElseGet(() -> new SubAnagram("", new HashMap<>()))
-          .containsWord(subAnagram);
-    }
-
-    return false;
-  }
-
-  /**
-   * Adds anagrams to the subAnagrams file. It merges the anagrams with the existing ones.
-   *
-   * @param word           the word to add
-   * @param subAnagramWord the subAnagramWord to add to word
-   */
-  public void addSubAnagram(String word, String subAnagramWord) throws InvalidSubAnagram {
-    if (!anagramHelper.isSubAnagramOfWord(word, subAnagramWord)
-        || word.length() == subAnagramWord.length()) {
-      throw new InvalidSubAnagram(
-          "The subAnagram " + subAnagramWord + " is not a subAnagram of " + word);
-    }
-
-    String hash = anagramHelper.lettersToHash(word);
-    SubAnagram subAnagram = subAnagramRepository
-        .findById(hash)
-        .orElseGet(() -> new SubAnagram(hash, new HashMap<>()));
-
-    subAnagram.addSubAnagram(subAnagramWord);
-    subAnagramRepository.save(subAnagram);
-  }
-
-  /**
    * Checks if a word is in the anagrams file, i.e. defined in the custom dictionary
    *
    * @param word to check
@@ -201,8 +159,9 @@ public class SubAnagramController {
           });
 
       List<SubAnagram> newSubAnagrams = new ArrayList<>();
-
-      hashes.parallelStream()
+      
+      hashes
+          .parallelStream()
           .forEach(hash -> {
             Map<Integer, TreeSet<String>> subAnagramsByLen = anagramHelper.computeSubAnagrams(
                 hashToWord.get(hash), anagramController::getAnagramsByHashes);
@@ -277,5 +236,49 @@ public class SubAnagramController {
 
     sb.setLength(sb.length() - 2); // to delete the last " | "
     return sb.toString();
+  }
+
+  /**
+   * Adds anagrams to the subAnagrams file. It merges the anagrams with the existing ones.
+   *
+   * @param word           the word to add
+   * @param subAnagramWord the subAnagramWord to add to word
+   */
+  @Deprecated
+  public void addSubAnagram(String word, String subAnagramWord) throws InvalidSubAnagram {
+    if (!anagramHelper.isSubAnagramOfWord(word, subAnagramWord)
+        || word.length() == subAnagramWord.length()) {
+      throw new InvalidSubAnagram(
+          "The subAnagram " + subAnagramWord + " is not a subAnagram of " + word);
+    }
+
+    String hash = anagramHelper.lettersToHash(word);
+    SubAnagram subAnagram = subAnagramRepository
+        .findById(hash)
+        .orElseGet(() -> new SubAnagram(hash, new HashMap<>()));
+
+    subAnagram.addSubAnagram(subAnagramWord);
+    subAnagramRepository.save(subAnagram);
+  }
+
+  /**
+   * Checks if a word is already contained in the subAnagram repository
+   *
+   * @param word       to check
+   * @param subAnagram to check
+   * @return true if the word is contained in the subAnagram, false otherwise
+   */
+  @Deprecated
+  public Boolean containsSubAnagram(String word, String subAnagram) {
+    String hash = anagramHelper.lettersToHash(word);
+
+    if (subAnagramRepository.existsById(hash)) {
+      return subAnagramRepository
+          .findById(hash)
+          .orElseGet(() -> new SubAnagram("", new HashMap<>()))
+          .containsWord(subAnagram);
+    }
+
+    return false;
   }
 }
