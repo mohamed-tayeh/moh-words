@@ -1,11 +1,13 @@
-package com.mohamedtayeh.wosbot.features;
+package com.mohamedtayeh.wosbot.features.commands;
 
 import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import com.github.twitch4j.chat.TwitchChat;
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public abstract class Command {
 
   /**
@@ -39,8 +41,7 @@ public abstract class Command {
       try {
         Thread.sleep(1);
       } catch (InterruptedException e) {
-        e.printStackTrace();
-        System.out.println("Error while sleeping to send message");
+        log.error("Error while sleeping to send message", e);
       }
     }
   }

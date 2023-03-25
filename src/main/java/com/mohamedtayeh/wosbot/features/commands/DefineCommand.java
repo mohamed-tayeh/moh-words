@@ -1,25 +1,36 @@
-package com.mohamedtayeh.wosbot.features;
+package com.mohamedtayeh.wosbot.features.commands;
 
 import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
-import com.mohamedtayeh.wosbot.features.constants.Constants;
-import com.mohamedtayeh.wosbot.features.constants.Responses;
 import com.mohamedtayeh.wosbot.features.dictionaryApi.DictionaryApi;
-import com.mohamedtayeh.wosbot.features.messageHelper.MessageHelper;
+import com.mohamedtayeh.wosbot.features.messageHelper.MessageUtils;
+import com.mohamedtayeh.wosbot.features.utils.Constants;
+import com.mohamedtayeh.wosbot.features.utils.Responses;
 import java.util.Arrays;
 import java.util.HashSet;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
-@NonNull
 @RequiredArgsConstructor
 public class DefineCommand extends Command {
 
   private final HashSet<String> cmdSet = new HashSet<>(Arrays.asList("!define"));
-  private final MessageHelper messageHelper;
-  private final DictionaryApi dictionaryApi;
+
+  /**
+   * Handles the response of the definition API query
+   *
+   * @param word        to query
+   * @param definitions retrieved from the API
+   * @return bot response to user
+   */
+  private String getResponse(String word, String definitions) {
+    if (definitions.isEmpty()) {
+      return String.format(Responses.NO_DEFINITION_RES, word);
+    }
+
+    return String.format(Responses.DEFINITION_RES, word, definitions);
+  }
 
   /**
    * Used to add a listener to the event handler
@@ -43,29 +54,16 @@ public class DefineCommand extends Command {
       return;
     }
 
-    String[] msgSplit = messageHelper.parseMesssage(event);
+    String[] msgSplit = MessageUtils.parseMesssage(event);
 
     if (cmdSet.contains(msgSplit[0]) && msgSplit.length > 1) {
       String word = msgSplit[1];
-      dictionaryApi
+      DictionaryApi
           .getDefinition(word)
           .thenApply(definitions -> getResponse(word, definitions))
           .thenAccept(res -> this.say(event, res));
     }
   }
 
-  /**
-   * Handles the response of the definition API query
-   *
-   * @param word        to query
-   * @param definitions retrieved from the API
-   * @return bot response to user
-   */
-  private String getResponse(String word, String definitions) {
-    if (definitions.isEmpty()) {
-      return String.format(Responses.NO_DEFINITION_RES, word);
-    }
 
-    return String.format(Responses.DEFINITION_RES, word, definitions);
-  }
 }

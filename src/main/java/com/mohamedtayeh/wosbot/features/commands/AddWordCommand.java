@@ -1,27 +1,29 @@
-package com.mohamedtayeh.wosbot.features;
+package com.mohamedtayeh.wosbot.features.commands;
 
 import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
 import com.mohamedtayeh.wosbot.db.newWord.NewWordController;
 import com.mohamedtayeh.wosbot.db.subAnagram.SubAnagramController;
-import com.mohamedtayeh.wosbot.features.constants.Constants;
-import com.mohamedtayeh.wosbot.features.constants.Responses;
 import com.mohamedtayeh.wosbot.features.dictionaryApi.DictionaryApi;
-import com.mohamedtayeh.wosbot.features.messageHelper.MessageHelper;
+import com.mohamedtayeh.wosbot.features.messageHelper.MessageUtils;
+import com.mohamedtayeh.wosbot.features.utils.Constants;
+import com.mohamedtayeh.wosbot.features.utils.Responses;
 import java.util.HashSet;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 public class AddWordCommand extends Command {
 
   private static final HashSet<String> cmdSet = new HashSet<String>(List.of("!addw", "!addword"));
-  private final MessageHelper messageHelper;
-  private final DictionaryApi dictionaryApi;
   private final SubAnagramController subAnagramController;
   private final NewWordController newWordController;
+
+  public AddWordCommand(SubAnagramController subAnagramController,
+      NewWordController newWordController) {
+    this.subAnagramController = subAnagramController;
+    this.newWordController = newWordController;
+  }
 
   /**
    * Used to add a listener to the event handler
@@ -43,7 +45,7 @@ public class AddWordCommand extends Command {
       return;
     }
 
-    String[] msgSplit = messageHelper.parseMesssage(event);
+    String[] msgSplit = MessageUtils.parseMesssage(event);
 
     if (!cmdSet.contains(msgSplit[0]) || msgSplit.length < 2) {
       return;
@@ -56,7 +58,7 @@ public class AddWordCommand extends Command {
       return;
     }
 
-    dictionaryApi
+    DictionaryApi
         .isWord(word)
         .thenAccept(isWord -> {
           if (isWord) {
