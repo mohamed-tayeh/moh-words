@@ -1,9 +1,8 @@
 package com.mohamedtayeh.wosbot.db.subAnagram;
 
 import com.mohamedtayeh.wosbot.db.anagram.AnagramController;
-import com.mohamedtayeh.wosbot.db.subAnagram.exceptions.InvalidSubAnagram;
 import com.mohamedtayeh.wosbot.features.anagramHelper.AnagramHelper;
-import com.mohamedtayeh.wosbot.features.constants.Constants;
+import com.mohamedtayeh.wosbot.features.utils.Constants;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -16,6 +15,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Page;
@@ -23,6 +23,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 @Scope("singleton")
 public class SubAnagramController {
 
@@ -54,6 +55,8 @@ public class SubAnagramController {
 
       gotAllKeys = !page.hasNext();
       pageNum++;
+
+      log.info("[SubAnagramController] getPrimaryKeys() - retrieved pageNum {} ", pageNum);
     }
   }
 
@@ -159,7 +162,7 @@ public class SubAnagramController {
           });
 
       List<SubAnagram> newSubAnagrams = new ArrayList<>();
-      
+
       hashes
           .parallelStream()
           .forEach(hash -> {
@@ -236,49 +239,5 @@ public class SubAnagramController {
 
     sb.setLength(sb.length() - 2); // to delete the last " | "
     return sb.toString();
-  }
-
-  /**
-   * Adds anagrams to the subAnagrams file. It merges the anagrams with the existing ones.
-   *
-   * @param word           the word to add
-   * @param subAnagramWord the subAnagramWord to add to word
-   */
-  @Deprecated
-  public void addSubAnagram(String word, String subAnagramWord) throws InvalidSubAnagram {
-    if (!anagramHelper.isSubAnagramOfWord(word, subAnagramWord)
-        || word.length() == subAnagramWord.length()) {
-      throw new InvalidSubAnagram(
-          "The subAnagram " + subAnagramWord + " is not a subAnagram of " + word);
-    }
-
-    String hash = anagramHelper.lettersToHash(word);
-    SubAnagram subAnagram = subAnagramRepository
-        .findById(hash)
-        .orElseGet(() -> new SubAnagram(hash, new HashMap<>()));
-
-    subAnagram.addSubAnagram(subAnagramWord);
-    subAnagramRepository.save(subAnagram);
-  }
-
-  /**
-   * Checks if a word is already contained in the subAnagram repository
-   *
-   * @param word       to check
-   * @param subAnagram to check
-   * @return true if the word is contained in the subAnagram, false otherwise
-   */
-  @Deprecated
-  public Boolean containsSubAnagram(String word, String subAnagram) {
-    String hash = anagramHelper.lettersToHash(word);
-
-    if (subAnagramRepository.existsById(hash)) {
-      return subAnagramRepository
-          .findById(hash)
-          .orElseGet(() -> new SubAnagram("", new HashMap<>()))
-          .containsWord(subAnagram);
-    }
-
-    return false;
   }
 }

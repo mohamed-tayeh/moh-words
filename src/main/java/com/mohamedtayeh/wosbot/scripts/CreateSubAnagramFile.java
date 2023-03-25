@@ -1,31 +1,33 @@
 package com.mohamedtayeh.wosbot.scripts;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mohamedtayeh.wosbot.features.constants.Constants;
-import com.mohamedtayeh.wosbot.features.constants.FilePaths;
 import com.mohamedtayeh.wosbot.features.subAnagramFile.SubAnagramFile;
+import com.mohamedtayeh.wosbot.features.utils.Constants;
+import com.mohamedtayeh.wosbot.features.utils.FilePaths;
+import com.mohamedtayeh.wosbot.features.utils.GeneralUtils;
 import java.io.File;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RequiredArgsConstructor
 public class CreateSubAnagramFile implements Script {
 
-  private final ObjectMapper objectMapper;
   private final SubAnagramFile subAnagramFile;
 
   @Override
-  public void run() {
-    System.out.println("Creating subAnagram file...");
+  public Integer call() {
+    log.info("Creating subAnagram file...");
     List<String> words;
 
     try {
-      words = objectMapper.readValue(new File(FilePaths.WORDS_FILE), new TypeReference<>() {
-      });
+      words = GeneralUtils.objectMapper.readValue(new File(FilePaths.WORDS_FILE),
+          new TypeReference<>() {
+          });
     } catch (Exception e) {
       e.printStackTrace();
-      return;
+      return 1;
     }
 
     int count = 0;
@@ -40,9 +42,10 @@ public class CreateSubAnagramFile implements Script {
       count++;
 
       if (count % 10000 == 0) {
-        System.out.println("Processed " + count + " words");
+        log.info("Processed {} words", count);
       }
     }
     subAnagramFile.saveFile(fileNum);
+    return 0;
   }
 }

@@ -3,14 +3,16 @@ package com.mohamedtayeh.wosbot.features.subAnagramFile;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mohamedtayeh.wosbot.features.anagramFile.AnagramFile;
 import com.mohamedtayeh.wosbot.features.anagramHelper.AnagramHelper;
-import com.mohamedtayeh.wosbot.features.constants.FilePaths;
+import com.mohamedtayeh.wosbot.features.utils.FilePaths;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.TreeSet;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @RequiredArgsConstructor
+@Slf4j
 public class SubAnagramFile {
 
   private final ObjectMapper objectMapper;
@@ -43,7 +45,7 @@ public class SubAnagramFile {
           subAnagrams);
       subAnagrams = new HashMap<>();
     } catch (IOException e) {
-      System.out.println("Error saving anagrams file: " + e.getMessage());
+      log.error("Error saving anagrams file", e);
     }
   }
 }

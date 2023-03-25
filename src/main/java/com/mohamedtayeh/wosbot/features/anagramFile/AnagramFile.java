@@ -3,7 +3,7 @@ package com.mohamedtayeh.wosbot.features.anagramFile;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mohamedtayeh.wosbot.features.anagramHelper.AnagramHelper;
-import com.mohamedtayeh.wosbot.features.constants.FilePaths;
+import com.mohamedtayeh.wosbot.features.utils.FilePaths;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -11,7 +11,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class AnagramFile {
 
   private final ObjectMapper objectMapper;
@@ -29,7 +31,7 @@ public class AnagramFile {
       anagrams = objectMapper.readValue(new File(FilePaths.ANAGRAM_FILE), new TypeReference<>() {
       });
     } catch (IOException e) {
-      System.out.println("Error reading anagrams file: " + e.getMessage());
+      log.error("Error reading anagrams file", e);
       System.exit(1);
     }
   }
@@ -78,7 +80,7 @@ public class AnagramFile {
         .flatMap(Set::stream)
         .collect(Collectors.toSet());
   }
-  
+
   /**
    * Gets a master set for the list of hashes
    *
@@ -98,8 +100,8 @@ public class AnagramFile {
   public synchronized void saveFile() {
     try {
       objectMapper.writeValue(new File(FilePaths.ANAGRAM_FILE), anagrams);
-    } catch (IOException ex) {
-      System.out.println("Error saving anagrams file: " + ex.getMessage());
+    } catch (IOException e) {
+      log.error("Error saving anagrams file ", e);
     }
   }
 }
