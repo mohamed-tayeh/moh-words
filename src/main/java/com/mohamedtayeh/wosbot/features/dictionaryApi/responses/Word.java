@@ -1,7 +1,7 @@
 package com.mohamedtayeh.wosbot.features.dictionaryApi.responses;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.mohamedtayeh.wosbot.features.constants.Constants;
+import com.mohamedtayeh.wosbot.features.utils.Constants;
 import lombok.Data;
 
 @JsonIgnoreProperties(ignoreUnknown = true)

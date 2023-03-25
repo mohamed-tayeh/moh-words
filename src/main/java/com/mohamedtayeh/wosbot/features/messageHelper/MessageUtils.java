@@ -1,10 +1,8 @@
 package com.mohamedtayeh.wosbot.features.messageHelper;
 
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
-import org.springframework.stereotype.Service;
 
-@Service
-public class MessageHelper {
+public class MessageUtils {
 
   /**
    * Parse the message based on space
@@ -12,7 +10,7 @@ public class MessageHelper {
    * @param event the event that triggered the command
    * @return array of words in the message
    */
-  public String[] parseMesssage(ChannelMessageEvent event) {
+  public static String[] parseMesssage(ChannelMessageEvent event) {
     String msg = event.getMessage().trim();
     String[] msgSplit = msg.split(" ");
 
