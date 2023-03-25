@@ -6,12 +6,10 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
-import lombok.NonNull;
 import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
-@NonNull
 public class AnagramController {
 
   private AnagramRepository anagramRepository;
