@@ -1,6 +1,8 @@
 package com.mohamedtayeh.wosbot.scripts;
 
-public interface Script {
+import java.util.concurrent.Callable;
 
-  void run();
+public interface Script extends Callable<Integer> {
+
 }
+
