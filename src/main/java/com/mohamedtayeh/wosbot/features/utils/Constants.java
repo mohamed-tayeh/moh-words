@@ -1,11 +1,8 @@
-package com.mohamedtayeh.wosbot.features.constants;
-
-import org.springframework.stereotype.Component;
+package com.mohamedtayeh.wosbot.features.utils;
 
 /**
  * Constants used in the application
  */
-@Component
 public class Constants {
 
   public static final String COMMAND_PREFIX = "!";

@@ -1,11 +1,8 @@
-package com.mohamedtayeh.wosbot.features.constants;
-
-import org.springframework.stereotype.Component;
+package com.mohamedtayeh.wosbot.features.utils;
 
 /**
  * FilePaths used in the application
  */
-@Component
 public class FilePaths {
 
   public static final String CHANNELS_FILE_NAME = "src/main/resources/channels.json";

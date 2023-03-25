@@ -1,11 +1,8 @@
-package com.mohamedtayeh.wosbot.features.constants;
-
-import org.springframework.stereotype.Component;
+package com.mohamedtayeh.wosbot.features.utils;
 
 /**
  * API URLS used in the application
  */
-@Component
 public class ApiURLS {
 
   public static final String DICTIONARY_API = "https://api.dictionaryapi.dev/api/v2/entries/en/%s";
