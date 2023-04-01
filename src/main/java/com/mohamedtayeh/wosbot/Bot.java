@@ -1,7 +1,6 @@
 package com.mohamedtayeh.wosbot;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import com.github.twitch4j.ITwitchClient;
@@ -14,6 +13,7 @@ import com.mohamedtayeh.wosbot.features.GetWordsCommand;
 import com.mohamedtayeh.wosbot.features.JoinChannelCommand;
 import com.mohamedtayeh.wosbot.features.LeaveChannelCommand;
 import com.mohamedtayeh.wosbot.features.constants.FilePaths;
+import com.mohamedtayeh.wosbot.features.utils.GenericUtils;
 import io.github.bucket4j.Bandwidth;
 import jakarta.annotation.PostConstruct;
 import java.io.File;
@@ -99,10 +99,11 @@ public class Bot {
   private void loadConfiguration() {
     try {
       // Credentials
-      ObjectMapper mapper = new ObjectMapper();
-      configuration = mapper.readValue(new File(FilePaths.CONFIG_FILE_NAME), Configuration.class);
+      configuration = GenericUtils.objectMapper.readValue(new File(FilePaths.CONFIG_FILE_NAME),
+          Configuration.class);
       // Channels
-      List<String> channels = mapper.readValue(new File(FilePaths.CHANNELS_FILE_NAME),
+      List<String> channels = GenericUtils.objectMapper.readValue(
+          new File(FilePaths.CHANNELS_FILE_NAME),
           new TypeReference<>() {
           });
       configuration.setChannels(channels);

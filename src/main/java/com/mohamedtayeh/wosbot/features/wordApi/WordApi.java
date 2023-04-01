@@ -1,8 +1,8 @@
 package com.mohamedtayeh.wosbot.features.wordApi;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mohamedtayeh.wosbot.features.constants.ApiURLS;
+import com.mohamedtayeh.wosbot.features.utils.GenericUtils;
 import com.mohamedtayeh.wosbot.features.wordApi.responses.AnagramRes;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -17,9 +17,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Slf4j
 public class WordApi {
-
-  private final ObjectMapper objectMapper;
-
+  
   /**
    * Returns a list of anagrams for a given word
    *
@@ -28,7 +26,8 @@ public class WordApi {
    * @param maxLength The maximum length of the anagrams
    * @return Completable future of a list of anagrams
    */
-  public CompletableFuture<String> getWords(String word, Integer minLength, Integer maxLength) {
+  public static CompletableFuture<String> getWords(String word, Integer minLength,
+      Integer maxLength) {
     if (word == null || word.isEmpty()) {
       return CompletableFuture.supplyAsync(() -> "");
     }
@@ -43,14 +42,14 @@ public class WordApi {
    * @param maxLength The maximum length of the anagrams
    * @return Completable future of the API response
    */
-  private CompletableFuture<String> queryWord(String word, Integer minLength,
+  private static CompletableFuture<String> queryWord(String word, Integer minLength,
       Integer maxLength) {
     HttpClient client = HttpClient.newHttpClient();
     String uri = String.format(ApiURLS.WORD_API, word, minLength - 1, maxLength + 1);
     HttpRequest req = HttpRequest.newBuilder().uri(URI.create(uri)).build();
     return client.sendAsync(req, HttpResponse.BodyHandlers.ofString())
         .thenApply(HttpResponse::body)
-        .thenApply(this::parseRes)
+        .thenApply(WordApi::parseRes)
         .thenApply(AnagramRes::getAnagramsString);
   }
 
@@ -60,11 +59,11 @@ public class WordApi {
    * @param res The API response
    * @return The parsed response
    */
-  private AnagramRes parseRes(String res) {
+  private static AnagramRes parseRes(String res) {
     AnagramRes anagramRes = new AnagramRes();
 
     try {
-      anagramRes = objectMapper.readValue(res, AnagramRes.class);
+      anagramRes = GenericUtils.objectMapper.readValue(res, AnagramRes.class);
     } catch (JsonProcessingException e) {
       log.error("An error occurred when reading the WordApi res", e);
     }

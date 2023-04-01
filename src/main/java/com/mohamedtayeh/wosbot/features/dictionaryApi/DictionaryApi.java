@@ -1,9 +1,9 @@
 package com.mohamedtayeh.wosbot.features.dictionaryApi;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mohamedtayeh.wosbot.features.constants.ApiURLS;
 import com.mohamedtayeh.wosbot.features.dictionaryApi.responses.Word;
+import com.mohamedtayeh.wosbot.features.utils.GenericUtils;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -15,16 +15,14 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class DictionaryApi {
-
-  private final ObjectMapper objectMapper;
-
+  
   /**
    * Gets the definition of a word from the dictionary api
    *
    * @param word the word to get the definition of
    * @return completable future with the definition of the word
    */
-  public CompletableFuture<String> getDefinition(String word) {
+  public static CompletableFuture<String> getDefinition(String word) {
     if (word == null || word.isEmpty()) {
       return CompletableFuture.supplyAsync(() -> "");
     }
@@ -38,7 +36,7 @@ public class DictionaryApi {
    * @param word the word to check
    * @return completable future with a boolean indicated if a word is a word
    */
-  public CompletableFuture<Boolean> isWord(String word) {
+  public static CompletableFuture<Boolean> isWord(String word) {
     if (word == null || word.isEmpty()) {
       return CompletableFuture.supplyAsync(() -> false);
     }
@@ -52,14 +50,14 @@ public class DictionaryApi {
    * @param word the word to query
    * @return completable future with the response of the dictionary api
    */
-  private CompletableFuture<Word> queryWord(String word) {
+  private static CompletableFuture<Word> queryWord(String word) {
     HttpClient client = HttpClient.newHttpClient();
     String uri = String.format(ApiURLS.DICTIONARY_API, word);
     HttpRequest req = HttpRequest.newBuilder().uri(URI.create(uri)).build();
 
     return client.sendAsync(req, HttpResponse.BodyHandlers.ofString())
         .thenApply(HttpResponse::body)
-        .thenApply(this::parse);
+        .thenApply(DictionaryApi::parse);
   }
 
   /**
@@ -68,11 +66,11 @@ public class DictionaryApi {
    * @param res the response of the dictionary api
    * @return the parsed response
    */
-  private Word parse(String res) {
+  private static Word parse(String res) {
     Word[] words = {new Word()};
 
     try {
-      words = objectMapper.readValue(res, Word[].class);
+      words = GenericUtils.objectMapper.readValue(res, Word[].class);
     } catch (JsonProcessingException e) {
       System.out.println("An error occurred when reading the DictionaryApi res: " + e.getMessage());
     }
