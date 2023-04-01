@@ -9,12 +9,10 @@ import com.mohamedtayeh.wosbot.features.messageHelper.MessageHelper;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
-@NonNull
 @RequiredArgsConstructor
 public class GetAnagramsCommand extends Command {
 

@@ -8,8 +8,10 @@ import com.mohamedtayeh.wosbot.features.subAnagramFile.SubAnagramFile;
 import java.io.File;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @RequiredArgsConstructor
+@Slf4j
 public class CreateSubAnagramFile implements Script {
 
   private final ObjectMapper objectMapper;
@@ -24,7 +26,7 @@ public class CreateSubAnagramFile implements Script {
       words = objectMapper.readValue(new File(FilePaths.WORDS_FILE), new TypeReference<>() {
       });
     } catch (Exception e) {
-      e.printStackTrace();
+      log.error("Unable to read WORDS_FILE", e);
       return;
     }
 

@@ -10,10 +10,12 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class WordApi {
 
   private final ObjectMapper objectMapper;
@@ -64,8 +66,7 @@ public class WordApi {
     try {
       anagramRes = objectMapper.readValue(res, AnagramRes.class);
     } catch (JsonProcessingException e) {
-      e.printStackTrace();
-      System.out.println("An error occurred when reading the WordApi res: " + e.getMessage());
+      log.error("An error occurred when reading the WordApi res", e);
     }
 
     return anagramRes;

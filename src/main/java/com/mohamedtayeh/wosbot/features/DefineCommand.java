@@ -8,12 +8,10 @@ import com.mohamedtayeh.wosbot.features.dictionaryApi.DictionaryApi;
 import com.mohamedtayeh.wosbot.features.messageHelper.MessageHelper;
 import java.util.Arrays;
 import java.util.HashSet;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
-@NonNull
 @RequiredArgsConstructor
 public class DefineCommand extends Command {
 

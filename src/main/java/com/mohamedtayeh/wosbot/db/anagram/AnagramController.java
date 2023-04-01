@@ -5,17 +5,15 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
-import lombok.AllArgsConstructor;
-import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
-@AllArgsConstructor
-@NonNull
+@RequiredArgsConstructor
 public class AnagramController {
 
-  private AnagramRepository anagramRepository;
-  private AnagramHelper anagramHelper;
+  private final AnagramRepository anagramRepository;
+  private final AnagramHelper anagramHelper;
 
   /**
    * Returns a string of the anagrams of the given letters

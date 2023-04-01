@@ -14,14 +14,16 @@ import com.mohamedtayeh.wosbot.features.GetWordsCommand;
 import com.mohamedtayeh.wosbot.features.JoinChannelCommand;
 import com.mohamedtayeh.wosbot.features.LeaveChannelCommand;
 import com.mohamedtayeh.wosbot.features.constants.FilePaths;
+import io.github.bucket4j.Bandwidth;
 import jakarta.annotation.PostConstruct;
 import java.io.File;
+import java.time.Duration;
 import java.util.List;
-import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 @Service
-@NonNull
+@Slf4j
 public class Bot {
 
   /**
@@ -60,9 +62,9 @@ public class Bot {
         .withEnableHelix(true)
         .withChatAccount(credential)
         .withEnableChat(true)
+        .withChatChannelMessageLimit(
+            Bandwidth.simple(1, Duration.ofSeconds(1)).withId("per-channel-limit"))
         .build();
-//        .withChatChannelMessageLimit(
-//            Bandwidth.simple(1, Duration.ofSeconds(2)).withId("per-channel-limit"))
 
     this.channelController = channelController;
     this.defineCommand = defineCommand;
@@ -105,9 +107,8 @@ public class Bot {
           });
       configuration.setChannels(channels);
 
-    } catch (Exception ex) {
-      ex.printStackTrace();
-      System.out.println("Unable to load Configuration ... Exiting.");
+    } catch (Exception e) {
+      log.error("Unable to load Configuration ... Exiting.", e);
       System.exit(1);
     }
   }

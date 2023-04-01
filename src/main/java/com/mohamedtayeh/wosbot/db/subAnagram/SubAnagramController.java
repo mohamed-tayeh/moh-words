@@ -16,6 +16,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Page;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Scope("singleton")
+@Slf4j
 public class SubAnagramController {
 
   private final ExecutorService executorService = Executors.newSingleThreadExecutor();
@@ -54,6 +56,7 @@ public class SubAnagramController {
 
       gotAllKeys = !page.hasNext();
       pageNum++;
+      log.info("[SubAnagramController] getPrimaryKeys() - retrieved pageNum {}", pageNum);
     }
   }
 
@@ -159,7 +162,7 @@ public class SubAnagramController {
           });
 
       List<SubAnagram> newSubAnagrams = new ArrayList<>();
-      
+
       hashes
           .parallelStream()
           .forEach(hash -> {

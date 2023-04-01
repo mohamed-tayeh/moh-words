@@ -10,8 +10,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.TreeSet;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @RequiredArgsConstructor
+@Slf4j
 public class WordsToAnagram {
 
   private final ObjectMapper objectMapper;
@@ -31,7 +33,7 @@ public class WordsToAnagram {
       words = objectMapper.readValue(new File(FilePaths.WORDS_FILE), new TypeReference<>() {
       });
     } catch (Exception e) {
-      e.printStackTrace();
+      log.error("Unable to read WORDS_FILE", e);
       return;
     }
 
